@@ -5,6 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { StorageManager } from '@/lib/storage';
 import { User, Round } from '@/lib/types';
 import { Plus, Users, History, BarChart3, Settings, LogOut, ChevronRight, TrendingUp, Target, Trophy, Calendar } from 'lucide-react';
+import { AchievementBadge, getAchievements } from '@/components/achievement-badge';
+import { BottomNavigation } from '@/components/bottom-navigation';
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -190,6 +192,20 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Achievements */}
+        <div className="mb-8">
+          <h3 className="text-xl font-bold mb-6 text-white">Logros</h3>
+          <div className="grid grid-cols-3 gap-4">
+            {getAchievements(stats, recentRounds).slice(0, 6).map(achievement => (
+              <AchievementBadge 
+                key={achievement.id} 
+                achievement={achievement} 
+                size="small"
+              />
+            ))}
+          </div>
+        </div>
+
         {/* Recent Rounds */}
         <div className="mb-8">
           <h3 className="text-xl font-bold mb-6 text-white">Actividad Reciente</h3>
@@ -274,29 +290,7 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-dark-surface border-t border-gray-800 safe-area-pb">
-        <div className="flex px-2 py-2">
-          <button className="flex-1 py-3 text-center rounded-xl bg-golf-blue bg-opacity-20">
-            <div className="w-6 h-6 mx-auto mb-1 flex items-center justify-center">
-              <span className="text-golf-blue">🏠</span>
-            </div>
-            <p className="text-xs text-golf-blue font-semibold">Inicio</p>
-          </button>
-          <button className="flex-1 py-3 text-center">
-            <History className="h-5 w-5 text-secondary mb-1 mx-auto" />
-            <p className="text-xs text-secondary">Historial</p>
-          </button>
-          <button className="flex-1 py-3 text-center">
-            <BarChart3 className="h-5 w-5 text-secondary mb-1 mx-auto" />
-            <p className="text-xs text-secondary">Stats</p>
-          </button>
-          <button className="flex-1 py-3 text-center">
-            <Settings className="h-5 w-5 text-secondary mb-1 mx-auto" />
-            <p className="text-xs text-secondary">Config</p>
-          </button>
-        </div>
-      </div>
+      <BottomNavigation />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { StorageManager } from '@/lib/storage';
 import { User, Round } from '@/lib/types';
 import { ArrowLeft, TrendingUp, TrendingDown, Target, BarChart3, Calendar, Trophy, Zap } from 'lucide-react';
+import { BottomNavigation } from '@/components/bottom-navigation';
 
 export default function Analytics() {
   const [, setLocation] = useLocation();
@@ -228,20 +229,33 @@ export default function Analytics() {
                   const userPlayer = round.players.find(p => p.id === user.id);
                   const score = userPlayer?.netTotal || 72;
                   const earnings = userPlayer?.moneyBalance || 0;
+                  const par = 72;
+                  const scoreToPar = score - par;
                   
                   return (
-                    <div key={round.id} className="flex items-center justify-between p-3 bg-dark-card rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-golf-blue rounded-lg flex items-center justify-center">
+                    <div key={round.id} className="flex items-center justify-between p-4 bg-dark-card rounded-xl border border-gray-600">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-golf-blue to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                           <span className="text-white text-sm font-bold">{5 - index}</span>
                         </div>
                         <div>
                           <p className="text-white font-medium">{round.course}</p>
                           <p className="text-gray-400 text-xs">{new Date(round.createdAt).toLocaleDateString('es-ES')}</p>
+                          <div className="flex items-center space-x-2 mt-1">
+                            <span className="text-xs text-gray-500">{round.players.length} jugadores</span>
+                            <span className="text-xs text-gray-500">•</span>
+                            <span className="text-xs text-gray-500">{round.holes} hoyos</span>
+                          </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-white font-bold">{score}</div>
+                        <div className="text-white font-bold text-lg">{score}</div>
+                        <div className={`text-sm font-medium ${
+                          scoreToPar === 0 ? 'text-blue-400' : 
+                          scoreToPar < 0 ? 'text-green-400' : 'text-red-400'
+                        }`}>
+                          {scoreToPar === 0 ? 'E' : (scoreToPar > 0 ? '+' : '')}{scoreToPar}
+                        </div>
                         <div className={`text-sm ${earnings >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                           {earnings >= 0 ? '+' : ''}${earnings.toFixed(0)}
                         </div>
@@ -252,6 +266,63 @@ export default function Analytics() {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Detailed Statistics */}
+        <div>
+          <h2 className="text-lg font-bold text-white mb-4">Estadísticas Detalladas</h2>
+          <div className="grid grid-cols-1 gap-4">
+            <Card className="bg-dark-surface border-gray-700">
+              <CardContent className="p-6">
+                <h3 className="text-white font-medium mb-4">Análisis de Handicap</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Handicap Actual</span>
+                    <span className="text-white font-bold">{user.handicap}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Score Promedio (Últimas 10)</span>
+                    <span className="text-white font-bold">{avgScore.toFixed(1)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Diferencial Promedio</span>
+                    <span className={`font-bold ${(avgScore - 72) < 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {(avgScore - 72) > 0 ? '+' : ''}{(avgScore - 72).toFixed(1)}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-dark-surface border-gray-700">
+              <CardContent className="p-6">
+                <h3 className="text-white font-medium mb-4">Rendimiento Financiero</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Ganancias Totales</span>
+                    <span className={`font-bold ${totalEarnings >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      ${totalEarnings.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Promedio por Ronda</span>
+                    <span className={`font-bold ${totalEarnings >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      ${userRounds.length > 0 ? (totalEarnings / userRounds.length).toFixed(2) : '0.00'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Rondas Ganadas</span>
+                    <span className="text-white font-bold">
+                      {userRounds.filter(round => {
+                        const userPlayer = round.players.find(p => p.id === user.id);
+                        return (userPlayer?.moneyBalance || 0) > 0;
+                      }).length} / {userRounds.length}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
