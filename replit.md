@@ -95,6 +95,18 @@ Mobile-optimized web application for golf scoring and betting calculations speci
   - Betting configuration summary and final money distribution
   - Seamless transition from scorecard completion to debriefing
   - Modern card-based layout with TheGrint-style visual design
+- **CORRECTED BETTING CALCULATIONS**: Fixed money distribution system:
+  - Proper handicap-based net score calculations using hole stroke index
+  - Accurate segment betting for Front Nine, Back Nine, and Total rounds
+  - Winner receives total pot minus their contribution, losers lose their bet
+  - Correct tie handling with proportional money splitting among winners
+  - Separate calculations for Stroke Play and Match Play formats
+  - Fixed JavaScript errors preventing round completion workflow
+- **ABANDON ROUND FEATURE**: Added functionality to exit rounds in progress:
+  - Red X button in scorecard header for easy access
+  - Confirmation toast message when abandoning a round
+  - Clears current round from storage and returns to dashboard
+  - Prevents loss of progress for completed holes
 
 ## User Preferences
 - Spanish language interface
