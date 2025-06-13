@@ -64,7 +64,8 @@ Mobile-optimized web application for golf scoring and betting calculations speci
   - Hoyo 17: Par 3 (was Par 5)
 - **REAL-TIME SCORING INDICATORS**: Enhanced scorecard with live status tracking:
   - Stroke Play indicators show position relative to par (E, +1, -2, etc.)
-  - Match Play indicators show standing vs leader (AS, 1 UP, 2 DN, etc.)
+  - Match Play indicators show hole-by-hole wins/losses (AS, 1 UP, 2 DN, etc.)
+  - Correct Match Play logic: each hole awards +1, -1, or 0 points only
   - Individual player status displayed under each name
   - Tournament status panel with live rankings for both formats
   - Color-coded indicators (green=good, red=behind, blue=even)

@@ -64,42 +64,53 @@ export function ModernScorecard({
     return `${diff}`;
   };
 
-  // Calculate match play status against the leader
+  // Calculate match play status against the field (hole-by-hole basis)
   const getMatchPlayStatus = (player: RoundPlayer) => {
-    const leader = players.reduce((best, current) => {
-      const bestNet = best.scores.filter(s => s.holeNumber <= currentHole)
-        .reduce((sum, score) => sum + score.netScore, 0);
-      const currentNet = current.scores.filter(s => s.holeNumber <= currentHole)
-        .reduce((sum, score) => sum + score.netScore, 0);
-      return currentNet < bestNet ? current : best;
-    });
+    if (players.length < 2) return 'AS';
     
-    if (player.id === leader.id) {
-      // Check if tied with others
-      const leaderNet = leader.scores.filter(s => s.holeNumber <= currentHole)
-        .reduce((sum, score) => sum + score.netScore, 0);
-      const ties = players.filter(p => {
-        const pNet = p.scores.filter(s => s.holeNumber <= currentHole)
-          .reduce((sum, score) => sum + score.netScore, 0);
-        return pNet === leaderNet;
-      });
+    let holesWon = 0;
+    let holesLost = 0;
+    
+    // Calculate match play results hole by hole against all other players
+    for (let hole = 1; hole <= currentHole; hole++) {
+      const playerScore = player.scores.find(s => s.holeNumber === hole);
       
-      return ties.length > 1 ? 'AS' : 'UP';
+      if (playerScore) {
+        const otherScores = players
+          .filter(p => p.id !== player.id)
+          .map(p => p.scores.find(s => s.holeNumber === hole))
+          .filter(score => score !== undefined);
+        
+        if (otherScores.length > 0) {
+          const playerNet = playerScore.netScore;
+          const bestOpponentNet = Math.min(...otherScores.map(s => s!.netScore));
+          
+          if (playerNet < bestOpponentNet) {
+            holesWon += 1; // Player wins the hole
+          } else if (playerNet > bestOpponentNet) {
+            holesLost += 1; // Player loses the hole
+          }
+          // Tie = no change to either counter
+        }
+      }
     }
     
-    const playerNet = player.scores.filter(s => s.holeNumber <= currentHole)
-      .reduce((sum, score) => sum + score.netScore, 0);
-    const leaderNet = leader.scores.filter(s => s.holeNumber <= currentHole)
-      .reduce((sum, score) => sum + score.netScore, 0);
-    
-    const diff = playerNet - leaderNet;
+    const matchPoints = holesWon - holesLost;
     const holesRemaining = 18 - currentHole;
     
-    if (diff === 0) return 'AS';
-    if (Math.abs(diff) >= holesRemaining) {
-      return diff > 0 ? `${diff} DOWN` : `${Math.abs(diff)} UP`;
+    if (matchPoints === 0) return 'AS'; // All Square
+    
+    // Check if match is mathematically decided
+    if (Math.abs(matchPoints) > holesRemaining) {
+      return matchPoints > 0 ? `${matchPoints} UP` : `${Math.abs(matchPoints)} DOWN`;
     }
-    return diff > 0 ? `${diff} DN` : `${Math.abs(diff)} UP`;
+    
+    // Match still active
+    if (matchPoints > 0) {
+      return `${matchPoints} UP`;
+    } else {
+      return `${Math.abs(matchPoints)} DN`;
+    }
   };
 
   const getStatusColor = (status: string | null) => {
@@ -357,21 +368,28 @@ export function ModernScorecard({
 
               {gameFormats.matchPlay && (
                 <div>
-                  <h4 className="text-sm font-medium text-green-400 mb-2">Match Play - Estado</h4>
+                  <h4 className="text-sm font-medium text-green-400 mb-2">Match Play - Estado (Hoyo por Hoyo)</h4>
                   <div className="space-y-2">
                     {players
-                      .map(player => ({
-                        ...player,
-                        status: getMatchPlayStatus(player),
-                        completedHoles: player.scores.filter(s => s.holeNumber <= currentHole).length
-                      }))
-                      .sort((a, b) => {
-                        const aNet = a.scores.filter(s => s.holeNumber <= currentHole)
-                          .reduce((sum, score) => sum + score.netScore, 0);
-                        const bNet = b.scores.filter(s => s.holeNumber <= currentHole)
-                          .reduce((sum, score) => sum + score.netScore, 0);
-                        return aNet - bNet;
+                      .map(player => {
+                        const status = getMatchPlayStatus(player);
+                        // Extract numeric value for sorting (UP = positive, DN = negative, AS = 0)
+                        let sortValue = 0;
+                        if (status && status !== 'AS' && status !== '—') {
+                          const match = status.match(/(\d+)\s*(UP|DN)/);
+                          if (match) {
+                            const value = parseInt(match[1]);
+                            sortValue = match[2] === 'UP' ? value : -value;
+                          }
+                        }
+                        return {
+                          ...player,
+                          status,
+                          sortValue,
+                          completedHoles: player.scores.filter(s => s.holeNumber <= currentHole).length
+                        };
                       })
+                      .sort((a, b) => b.sortValue - a.sortValue) // Sort by match play position
                       .map((player, index) => (
                         <div key={player.id} className="flex items-center justify-between p-2 bg-dark-card rounded">
                           <div className="flex items-center space-x-3">
