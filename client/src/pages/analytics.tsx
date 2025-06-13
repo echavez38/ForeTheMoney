@@ -325,6 +325,12 @@ export default function Analytics() {
           </div>
         </div>
       </div>
+      
+      <div className="pb-20">
+        {/* Extra padding for bottom navigation */}
+      </div>
+      
+      <BottomNavigation />
     </div>
   );
 }

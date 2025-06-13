@@ -290,6 +290,10 @@ export default function Dashboard() {
         </Card>
       </div>
 
+      <div className="pb-20">
+        {/* Extra padding for bottom navigation */}
+      </div>
+
       <BottomNavigation />
     </div>
   );
