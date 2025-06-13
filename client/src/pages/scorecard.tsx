@@ -109,16 +109,26 @@ export default function Scorecard() {
   const finishRound = () => {
     if (!round) return;
 
-    // Calculate final money balances
-    const holes = DEFAULT_HOLES.slice(0, round.holes);
-    const balances = BettingCalculator.calculateTotalBetting(round, holes);
+    // Calculate final money balances using the corrected betting system
+    const frontNineResults = BettingCalculator.calculateSegmentBetting(round, 'frontNine');
+    const backNineResults = BettingCalculator.calculateSegmentBetting(round, 'backNine');
+    const totalResults = BettingCalculator.calculateSegmentBetting(round, 'total');
+    
+    // Combine all betting results
+    const finalBalances: Record<string, number> = {};
+    round.players.forEach(player => {
+      finalBalances[player.id] = 
+        (frontNineResults.playerBalances[player.id] || 0) + 
+        (backNineResults.playerBalances[player.id] || 0) + 
+        (totalResults.playerBalances[player.id] || 0);
+    });
     
     const finalRound = {
       ...round,
       completed: true,
       players: round.players.map(player => ({
         ...player,
-        moneyBalance: balances.get(player.name) || 0,
+        moneyBalance: finalBalances[player.id] || 0,
       })),
     };
 
