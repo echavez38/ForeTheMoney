@@ -130,7 +130,7 @@ export default function Scorecard() {
       description: "Ver resultados finales",
     });
     
-    setLocation('/results');
+    setLocation('/round-debrief');
   };
 
   const handleViewScorecard = () => {

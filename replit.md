@@ -86,6 +86,15 @@ Mobile-optimized web application for golf scoring and betting calculations speci
   - Modern bottom navigation with floating action button design
   - Win rate calculations and earning analysis features
   - Best/worst round tracking with detailed performance insights
+- **COMPREHENSIVE ROUND DEBRIEFING**: Complete post-round analysis and summary:
+  - Dedicated debriefing page with tabbed interface (Overview, Betting, Scores)
+  - Winner announcement with performance celebration
+  - Detailed leaderboard with final standings and earnings
+  - Segment-by-segment betting results (Front Nine, Back Nine, Total)
+  - Individual player scorecards with hole-by-hole breakdown
+  - Betting configuration summary and final money distribution
+  - Seamless transition from scorecard completion to debriefing
+  - Modern card-based layout with TheGrint-style visual design
 
 ## User Preferences
 - Spanish language interface
