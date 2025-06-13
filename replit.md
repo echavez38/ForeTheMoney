@@ -57,6 +57,11 @@ Mobile-optimized web application for golf scoring and betting calculations speci
   - Shows gross/net scores with proper golf formatting
   - Accessible via card icon button during gameplay
   - Complete summary with money balances and performance statistics
+- **PAR CORRECTIONS**: Updated Club Campestre de Puebla hole pars:
+  - Hoyo 6: Par 4 (was Par 5), Hoyo 8: Par 3 (was Par 4)
+  - Hoyo 9: Par 5 (was Par 3), Hoyo 12: Par 5 (was Par 3)
+  - Hoyo 13: Par 3 (was Par 5), Hoyo 15: Par 5 (was Par 3)
+  - Hoyo 17: Par 3 (was Par 5)
 
 ## User Preferences
 - Spanish language interface
