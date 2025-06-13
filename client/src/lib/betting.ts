@@ -57,6 +57,104 @@ export class BettingCalculator {
     return results;
   }
 
+  static calculateSideBets(
+    players: RoundPlayer[],
+    holeInfo: HoleInfo,
+    bettingOptions: BettingOptions
+  ): BettingResult[] {
+    const results: BettingResult[] = [];
+
+    // Longest Drive (solo en par 4 y par 5)
+    if (bettingOptions.sideBets.longestDrive && holeInfo.par >= 4) {
+      const longestDriveWinner = players.find(player => {
+        const score = player.scores.find(s => s.holeNumber === holeInfo.number);
+        return score?.longestDrive === player.id;
+      });
+
+      if (longestDriveWinner) {
+        results.push({
+          type: 'skins', // Usamos 'skins' como tipo genérico para side bets
+          winner: longestDriveWinner.name,
+          amount: bettingOptions.unitPerHole * players.length,
+          tied: false,
+        });
+      }
+    }
+
+    // Birdie Pool
+    if (bettingOptions.sideBets.birdiePool) {
+      players.forEach(player => {
+        const score = player.scores.find(s => s.holeNumber === holeInfo.number);
+        if (score?.birdieAchieved && score.grossScore < holeInfo.par) {
+          results.push({
+            type: 'skins',
+            winner: player.name,
+            amount: bettingOptions.unitPerHole * 2, // Bonificación especial por birdie
+            tied: false,
+          });
+        }
+      });
+    }
+
+    // Sand Saves
+    if (bettingOptions.sideBets.sandSaves) {
+      players.forEach(player => {
+        const score = player.scores.find(s => s.holeNumber === holeInfo.number);
+        if (score?.sandSave && score.grossScore <= holeInfo.par) {
+          results.push({
+            type: 'skins',
+            winner: player.name,
+            amount: bettingOptions.unitPerHole,
+            tied: false,
+          });
+        }
+      });
+    }
+
+    return results;
+  }
+
+  static calculateCarryovers(
+    players: RoundPlayer[],
+    holeInfo: HoleInfo,
+    bettingOptions: BettingOptions,
+    carryoverAmount: number = 0
+  ): { winner: string | null; amount: number; newCarryover: number } {
+    if (!bettingOptions.carryovers) {
+      return { winner: null, amount: 0, newCarryover: 0 };
+    }
+
+    // Obtener ganador del hoyo actual
+    const holeScores = players.map(player => {
+      const score = player.scores.find(s => s.holeNumber === holeInfo.number);
+      return {
+        player,
+        netScore: score ? score.netScore : 999
+      };
+    }).sort((a, b) => a.netScore - b.netScore);
+
+    const winningScore = holeScores[0].netScore;
+    const winners = holeScores.filter(h => h.netScore === winningScore);
+    
+    const potAmount = bettingOptions.unitPerHole * players.length + carryoverAmount;
+
+    if (winners.length === 1) {
+      // Hay ganador único, se lleva todo el pozo acumulado
+      return {
+        winner: winners[0].player.name,
+        amount: potAmount,
+        newCarryover: 0
+      };
+    } else {
+      // Empate, se acumula para el siguiente hoyo
+      return {
+        winner: null,
+        amount: 0,
+        newCarryover: potAmount
+      };
+    }
+  }
+
   static calculateSegmentBetting(
     round: { players: RoundPlayer[]; bettingOptions: BettingOptions; gameFormats: { strokePlay: boolean; matchPlay: boolean } },
     segment: 'frontNine' | 'backNine' | 'total'

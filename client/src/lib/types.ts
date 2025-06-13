@@ -38,6 +38,10 @@ export interface HoleScore {
   par: number;
   strokeIndex: number;
   oyesesWinner?: string; // ID del jugador que ganó "Oyeses" (closest to pin) en este hoyo par 3
+  // Side bets por hoyo
+  longestDrive?: string; // ID del jugador con el drive más largo
+  birdieAchieved?: boolean; // Si este jugador hizo birdie
+  sandSave?: boolean; // Si salvó desde bunker
 }
 
 export interface BettingOptions {
@@ -60,6 +64,19 @@ export interface BettingOptions {
     backNine: number;
     total: number;
   };
+  // Apuestas avanzadas
+  sideBets: {
+    longestDrive: boolean;
+    allPar3Closest: boolean;
+    birdiePool: boolean;
+    sandSaves: boolean;
+  };
+  pressBets: {
+    enabled: boolean;
+    autoPress: boolean; // Automático cuando vas 2 down
+    pressAmount: number;
+  };
+  carryovers: boolean; // Acumular dinero de hoyos empatados
 }
 
 export interface HoleInfo {

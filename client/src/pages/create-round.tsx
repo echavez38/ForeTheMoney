@@ -40,6 +40,18 @@ export default function CreateRound() {
       backNine: 15.0,
       total: 30.0,
     },
+    sideBets: {
+      longestDrive: false,
+      allPar3Closest: false,
+      birdiePool: false,
+      sandSaves: false,
+    },
+    pressBets: {
+      enabled: false,
+      autoPress: true,
+      pressAmount: 5.0,
+    },
+    carryovers: false,
   });
 
   const [newPlayerName, setNewPlayerName] = useState('');
@@ -630,6 +642,166 @@ export default function CreateRound() {
                   </div>
                 </div>
               )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Apuestas Avanzadas */}
+        <Card className="bg-dark-surface border-gray-700">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4 text-white">Apuestas Avanzadas</h3>
+            
+            {/* Side Bets */}
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-md font-medium text-yellow-400 mb-3">Side Bets</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-white">Longest Drive</label>
+                      <p className="text-gray-400 text-sm">Drive más largo en hoyos par 4/5</p>
+                    </div>
+                    <Checkbox
+                      checked={bettingOptions.sideBets.longestDrive}
+                      onCheckedChange={(checked) => 
+                        setBettingOptions({
+                          ...bettingOptions, 
+                          sideBets: {
+                            ...bettingOptions.sideBets,
+                            longestDrive: checked as boolean
+                          }
+                        })
+                      }
+                      className="border-gray-600"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-white">Birdie Pool</label>
+                      <p className="text-gray-400 text-sm">Pozo acumulativo por cada birdie</p>
+                    </div>
+                    <Checkbox
+                      checked={bettingOptions.sideBets.birdiePool}
+                      onCheckedChange={(checked) => 
+                        setBettingOptions({
+                          ...bettingOptions, 
+                          sideBets: {
+                            ...bettingOptions.sideBets,
+                            birdiePool: checked as boolean
+                          }
+                        })
+                      }
+                      className="border-gray-600"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-white">Sand Saves</label>
+                      <p className="text-gray-400 text-sm">Bonificación por salvar desde bunker</p>
+                    </div>
+                    <Checkbox
+                      checked={bettingOptions.sideBets.sandSaves}
+                      onCheckedChange={(checked) => 
+                        setBettingOptions({
+                          ...bettingOptions, 
+                          sideBets: {
+                            ...bettingOptions.sideBets,
+                            sandSaves: checked as boolean
+                          }
+                        })
+                      }
+                      className="border-gray-600"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Press Bets */}
+              <div>
+                <h4 className="text-md font-medium text-green-400 mb-3">Press Bets</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-white">Activar Press Bets</label>
+                      <p className="text-gray-400 text-sm">Duplicar apuestas cuando vas perdiendo</p>
+                    </div>
+                    <Checkbox
+                      checked={bettingOptions.pressBets.enabled}
+                      onCheckedChange={(checked) => 
+                        setBettingOptions({
+                          ...bettingOptions, 
+                          pressBets: {
+                            ...bettingOptions.pressBets,
+                            enabled: checked as boolean
+                          }
+                        })
+                      }
+                      className="border-gray-600"
+                    />
+                  </div>
+
+                  {bettingOptions.pressBets.enabled && (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <label className="text-white">Auto Press (2 down)</label>
+                        <Checkbox
+                          checked={bettingOptions.pressBets.autoPress}
+                          onCheckedChange={(checked) => 
+                            setBettingOptions({
+                              ...bettingOptions, 
+                              pressBets: {
+                                ...bettingOptions.pressBets,
+                                autoPress: checked as boolean
+                              }
+                            })
+                          }
+                          className="border-gray-600"
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <label className="text-white">Monto Press ($)</label>
+                        <Input
+                          type="number"
+                          value={bettingOptions.pressBets.pressAmount}
+                          onChange={(e) => 
+                            setBettingOptions({
+                              ...bettingOptions, 
+                              pressBets: {
+                                ...bettingOptions.pressBets,
+                                pressAmount: parseFloat(e.target.value) || 0
+                              }
+                            })
+                          }
+                          min="0"
+                          step="1"
+                          className="w-20 bg-dark-card border-gray-600 text-white text-center"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Carryovers */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-white">Carryovers</label>
+                  <p className="text-gray-400 text-sm">Acumular dinero de hoyos empatados</p>
+                </div>
+                <Checkbox
+                  checked={bettingOptions.carryovers}
+                  onCheckedChange={(checked) => 
+                    setBettingOptions({
+                      ...bettingOptions, 
+                      carryovers: checked as boolean
+                    })
+                  }
+                  className="border-gray-600"
+                />
+              </div>
             </div>
           </CardContent>
         </Card>
