@@ -1,6 +1,7 @@
-import { pgTable, text, serial, integer, boolean, timestamp, real } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, real, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -14,6 +15,8 @@ export const rounds = pgTable("rounds", {
   id: serial("id").primaryKey(),
   course: text("course").notNull(),
   holes: integer("holes").notNull(),
+  currentHole: integer("current_hole").default(1),
+  bettingOptions: jsonb("betting_options").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   completed: boolean("completed").default(false),
 });
@@ -34,7 +37,29 @@ export const scores = pgTable("scores", {
   holeNumber: integer("hole_number").notNull(),
   grossScore: integer("gross_score").notNull(),
   netScore: integer("net_score").notNull(),
+  par: integer("par").notNull(),
+  strokeIndex: integer("stroke_index").notNull(),
 });
+
+// Relations
+export const roundsRelations = relations(rounds, ({ many }) => ({
+  players: many(players),
+}));
+
+export const playersRelations = relations(players, ({ one, many }) => ({
+  round: one(rounds, {
+    fields: [players.roundId],
+    references: [rounds.id],
+  }),
+  scores: many(scores),
+}));
+
+export const scoresRelations = relations(scores, ({ one }) => ({
+  player: one(players, {
+    fields: [scores.playerId],
+    references: [players.id],
+  }),
+}));
 
 export const insertUserSchema = createInsertSchema(users).pick({
   name: true,
@@ -45,6 +70,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertRoundSchema = createInsertSchema(rounds).pick({
   course: true,
   holes: true,
+  currentHole: true,
+  bettingOptions: true,
 });
 
 export const insertPlayerSchema = createInsertSchema(players).pick({
@@ -58,6 +85,8 @@ export const insertScoreSchema = createInsertSchema(scores).pick({
   holeNumber: true,
   grossScore: true,
   netScore: true,
+  par: true,
+  strokeIndex: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
