@@ -71,6 +71,66 @@ export function GolfScorecard({ round }: GolfScorecardProps) {
     return hole.strokeIndex[player.selectedTee.color as keyof typeof hole.strokeIndex] || hole.strokeIndex.blancas;
   };
 
+  // Calculate Stroke Play status for a player at a specific hole
+  const getStrokePlayStatusAtHole = (playerId: string, holeNumber: number) => {
+    const player = round.players.find(p => p.id === playerId);
+    if (!player) return '';
+    
+    const holesPlayed = player.scores.filter(s => s.holeNumber <= holeNumber);
+    if (holesPlayed.length === 0) return '';
+    
+    const totalNet = holesPlayed.reduce((sum, score) => sum + score.netScore, 0);
+    const totalPar = holesPlayed.reduce((sum, score) => sum + score.par, 0);
+    const toPar = totalNet - totalPar;
+    
+    if (toPar === 0) return 'E';
+    if (toPar > 0) return `+${toPar}`;
+    return `${toPar}`;
+  };
+
+  // Calculate Match Play status for a player at a specific hole
+  const getMatchPlayStatusAtHole = (playerId: string, holeNumber: number) => {
+    const player = round.players.find(p => p.id === playerId);
+    if (!player || round.players.length < 2) return '';
+    
+    let holesWon = 0;
+    let holesLost = 0;
+    
+    // Calculate match play results hole by hole against all other players
+    for (let hole = 1; hole <= holeNumber; hole++) {
+      const playerScore = player.scores.find(s => s.holeNumber === hole);
+      
+      if (playerScore) {
+        const otherScores = round.players
+          .filter(p => p.id !== player.id)
+          .map(p => p.scores.find(s => s.holeNumber === hole))
+          .filter(score => score !== undefined);
+        
+        if (otherScores.length > 0) {
+          const playerNet = playerScore.netScore;
+          const bestOpponentNet = Math.min(...otherScores.map(s => s!.netScore));
+          
+          if (playerNet < bestOpponentNet) {
+            holesWon += 1; // Player wins the hole
+          } else if (playerNet > bestOpponentNet) {
+            holesLost += 1; // Player loses the hole
+          }
+          // Tie = no change to either counter
+        }
+      }
+    }
+    
+    const matchPoints = holesWon - holesLost;
+    
+    if (matchPoints === 0) return 'AS'; // All Square
+    
+    if (matchPoints > 0) {
+      return `${matchPoints} UP`;
+    } else {
+      return `${Math.abs(matchPoints)} DN`;
+    }
+  };
+
   const frontNinePar = frontNine.reduce((sum, hole) => sum + hole.par, 0);
   const backNinePar = backNine.reduce((sum, hole) => sum + hole.par, 0);
   const totalPar = frontNinePar + backNinePar;
@@ -354,6 +414,121 @@ export function GolfScorecard({ round }: GolfScorecardProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Stroke Play Section */}
+      {round.gameFormats.strokePlay && (
+        <Card className="bg-dark-surface border-gray-700">
+          <CardContent className="p-4">
+            <h3 className="text-lg font-semibold text-blue-400 mb-4 text-center">Stroke Play - Estado por Hoyo</h3>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-gray-600">
+                    <th className="text-white font-semibold p-2 text-left">JUGADOR</th>
+                    {DEFAULT_HOLES.map(hole => (
+                      <th key={hole.number} className="text-white font-semibold p-1 text-center min-w-[40px]">
+                        {hole.number}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                
+                <tbody>
+                  {round.players.map(player => (
+                    <tr key={player.id} className="border-b border-gray-600">
+                      <td className="text-white font-semibold p-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-golf-green rounded-full flex items-center justify-center">
+                            <span className="text-xs font-bold text-white">
+                              {player.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <span className="text-sm">{player.name}</span>
+                        </div>
+                      </td>
+                      {DEFAULT_HOLES.map(hole => {
+                        const status = getStrokePlayStatusAtHole(player.id, hole.number);
+                        const hasScore = player.scores.find(s => s.holeNumber === hole.number);
+                        return (
+                          <td key={`sp-${player.id}-${hole.number}`} className="p-1 text-center">
+                            <div className={`w-8 h-6 flex items-center justify-center rounded text-xs font-semibold ${
+                              !hasScore ? 'text-gray-500' :
+                              status === 'E' ? 'bg-blue-600 text-white' :
+                              status.startsWith('+') ? 'bg-red-600 text-white' :
+                              'bg-green-600 text-white'
+                            }`}>
+                              {hasScore ? status || 'E' : '—'}
+                            </div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Match Play Section */}
+      {round.gameFormats.matchPlay && (
+        <Card className="bg-dark-surface border-gray-700">
+          <CardContent className="p-4">
+            <h3 className="text-lg font-semibold text-green-400 mb-4 text-center">Match Play - Estado por Hoyo</h3>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-gray-600">
+                    <th className="text-white font-semibold p-2 text-left">JUGADOR</th>
+                    {DEFAULT_HOLES.map(hole => (
+                      <th key={hole.number} className="text-white font-semibold p-1 text-center min-w-[40px]">
+                        {hole.number}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                
+                <tbody>
+                  {round.players.map(player => (
+                    <tr key={player.id} className="border-b border-gray-600">
+                      <td className="text-white font-semibold p-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-golf-green rounded-full flex items-center justify-center">
+                            <span className="text-xs font-bold text-white">
+                              {player.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <span className="text-sm">{player.name}</span>
+                        </div>
+                      </td>
+                      {DEFAULT_HOLES.map(hole => {
+                        const status = getMatchPlayStatusAtHole(player.id, hole.number);
+                        const hasScore = player.scores.find(s => s.holeNumber === hole.number);
+                        return (
+                          <td key={`mp-${player.id}-${hole.number}`} className="p-1 text-center">
+                            <div className={`w-8 h-6 flex items-center justify-center rounded text-xs font-semibold ${
+                              !hasScore ? 'text-gray-500' :
+                              status === 'AS' ? 'bg-blue-600 text-white' :
+                              status.includes('UP') ? 'bg-green-600 text-white' :
+                              status.includes('DN') ? 'bg-red-600 text-white' :
+                              'bg-gray-600 text-white'
+                            }`}>
+                              {hasScore ? status || 'AS' : '—'}
+                            </div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
