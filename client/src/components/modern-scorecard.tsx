@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { RoundPlayer, HoleInfo } from '@/lib/types';
+import { RoundPlayer, HoleInfo, TeeSelection } from '@/lib/types';
 import { ChevronLeft, ChevronRight, RotateCw, Target, TrendingUp } from 'lucide-react';
 
 interface ModernScorecardProps {
   players: RoundPlayer[];
   currentHole: number;
   holeInfo: HoleInfo;
+  selectedTees: TeeSelection;
   onScoreChange: (playerId: string, score: number) => void;
   onNavigate: (direction: 'prev' | 'next') => void;
   canGoNext: boolean;
@@ -18,6 +19,7 @@ export function ModernScorecard({
   players, 
   currentHole, 
   holeInfo, 
+  selectedTees,
   onScoreChange,
   onNavigate,
   canGoNext,
@@ -60,7 +62,7 @@ export function ModernScorecard({
             </Button>
             <div>
               <h1 className="text-lg font-bold text-white">Hoyo {currentHole}</h1>
-              <p className="text-sm text-secondary">Par {holeInfo.par} • {holeInfo.distance}m</p>
+              <p className="text-sm text-secondary">Par {holeInfo.par} • {holeInfo.distances[selectedTees.color]}m</p>
             </div>
           </div>
           
@@ -167,7 +169,7 @@ export function ModernScorecard({
                 <p className="text-xs text-secondary">Índice Handicap</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-white">{holeInfo.distance}m</p>
+                <p className="text-2xl font-bold text-white">{holeInfo.distances[selectedTees.color]}m</p>
                 <p className="text-xs text-secondary">Distancia</p>
               </div>
               <div className="text-center">

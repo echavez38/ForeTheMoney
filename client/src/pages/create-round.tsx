@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { StorageManager } from '@/lib/storage';
-import { User, Round, RoundPlayer, BettingOptions } from '@/lib/types';
+import { User, Round, RoundPlayer, BettingOptions, TeeSelection, TEE_OPTIONS } from '@/lib/types';
 import { ArrowLeft, Plus, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
