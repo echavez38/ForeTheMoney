@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { StorageManager } from '@/lib/storage';
 import { User, Round } from '@/lib/types';
-import { Plus, Users, History, BarChart3, Settings, LogOut, ChevronRight } from 'lucide-react';
+import { Plus, Users, History, BarChart3, Settings, LogOut, ChevronRight, TrendingUp, Target, Trophy, Calendar } from 'lucide-react';
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -79,11 +79,120 @@ export default function Dashboard() {
               <ChevronRight className="h-6 w-6" />
             </div>
           </Button>
+          
+          <Button
+            onClick={() => setLocation('/analytics')}
+            className="bg-gradient-to-r from-purple-600 to-blue-600 p-6 h-auto rounded-2xl text-center hover:from-purple-700 hover:to-blue-700 transition-all duration-200 flex items-center justify-between shadow-lg"
+          >
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                <BarChart3 className="h-5 w-5 text-white" />
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-white">Análisis de Rendimiento</p>
+                <p className="text-sm text-purple-100">Estadísticas detalladas y tendencias</p>
+              </div>
+            </div>
+            <div className="text-white opacity-50">
+              <ChevronRight className="h-5 w-5" />
+            </div>
+          </Button>
+        </div>
+
+        {/* Performance Overview */}
+        <div className="mb-8">
+          <h3 className="text-xl font-bold mb-6 text-white">Resumen de Rendimiento</h3>
+          
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <Card className="bg-gradient-to-br from-green-600 to-green-700 border-0">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Trophy className="h-5 w-5 text-white mr-2" />
+                  <span className="text-sm font-medium text-white">Balance Total</span>
+                </div>
+                <div className="text-2xl font-bold text-white">${stats.totalWinnings.toFixed(2)}</div>
+                <div className="text-xs text-green-100 mt-1">Últimas rondas</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-blue-600 to-blue-700 border-0">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Target className="h-5 w-5 text-white mr-2" />
+                  <span className="text-sm font-medium text-white">Handicap</span>
+                </div>
+                <div className="text-2xl font-bold text-white">{user.handicap}</div>
+                <div className="text-xs text-blue-100 mt-1">Índice actual</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="bg-dark-surface border-gray-700">
+              <CardContent className="p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-lg font-bold text-white">{stats.roundsPlayed}</div>
+                    <div className="text-xs text-gray-400">Rondas Jugadas</div>
+                  </div>
+                  <Calendar className="h-4 w-4 text-gray-400" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-dark-surface border-gray-700">
+              <CardContent className="p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-lg font-bold text-golf-green">
+                      {stats.roundsPlayed > 0 ? (stats.totalWinnings / stats.roundsPlayed).toFixed(1) : '0.0'}
+                    </div>
+                    <div className="text-xs text-gray-400">$/Ronda</div>
+                  </div>
+                  <TrendingUp className="h-4 w-4 text-golf-green" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-dark-surface border-gray-700">
+              <CardContent className="p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-lg font-bold text-white">
+                      {recentRounds.length > 0 ? 
+                        Math.round(recentRounds.reduce((avg, round) => {
+                          const userPlayer = round.players.find(p => p.id === user.id);
+                          return avg + (userPlayer?.netTotal || 72);
+                        }, 0) / recentRounds.length) : 72
+                      }
+                    </div>
+                    <div className="text-xs text-gray-400">Score Promedio</div>
+                  </div>
+                  <BarChart3 className="h-4 w-4 text-gray-400" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-dark-surface border-gray-700">
+              <CardContent className="p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-lg font-bold text-yellow-400">
+                      {recentRounds.length > 0 ? 
+                        Math.round((recentRounds.filter(round => {
+                          const userPlayer = round.players.find(p => p.id === user.id);
+                          return (userPlayer?.moneyBalance || 0) > 0;
+                        }).length / recentRounds.length) * 100) : 0
+                      }%
+                    </div>
+                    <div className="text-xs text-gray-400">Win Rate</div>
+                  </div>
+                  <Trophy className="h-4 w-4 text-yellow-400" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Recent Rounds */}
         <div className="mb-8">
-          <h3 className="text-xl font-bold mb-6 text-white">Rondas Recientes</h3>
+          <h3 className="text-xl font-bold mb-6 text-white">Actividad Reciente</h3>
           
           {recentRounds.length > 0 ? (
             <div className="space-y-4">
