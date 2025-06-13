@@ -14,9 +14,14 @@ interface ModernScorecardProps {
   canGoPrev: boolean;
   onViewScorecard?: () => void;
   onAbandonRound?: () => void;
+  onOyesesWinnerChange?: (playerId: string) => void;
   gameFormats: {
     strokePlay: boolean;
     matchPlay: boolean;
+  };
+  bettingOptions: {
+    oyeses: boolean;
+    unitPerHole: number;
   };
 }
 
@@ -30,9 +35,17 @@ export function ModernScorecard({
   canGoPrev,
   onViewScorecard,
   onAbandonRound,
-  gameFormats
+  onOyesesWinnerChange,
+  gameFormats,
+  bettingOptions
 }: ModernScorecardProps) {
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
+  
+  // Get current oyeses winner for this hole
+  const currentOyesesWinner = players.find(player => {
+    const holeScore = player.scores.find(s => s.holeNumber === currentHole);
+    return holeScore?.oyesesWinner === player.id;
+  });
 
   const getScoreColor = (score: number, par: number) => {
     const diff = score - par;
@@ -423,6 +436,71 @@ export function ModernScorecard({
                         </div>
                       ))
                     }
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Oyeses (Closest to Pin) Section - Only for Par 3s */}
+      {holeInfo.par === 3 && bettingOptions.oyeses && (
+        <div className="px-4 pb-4">
+          <Card className="bg-gradient-to-r from-yellow-900/20 to-orange-900/20 border-yellow-700">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-center mb-3">
+                <Target className="h-5 w-5 text-yellow-400 mr-2" />
+                <h3 className="text-lg font-semibold text-yellow-400">Oyeses - Closest to Pin</h3>
+              </div>
+              <p className="text-center text-gray-300 text-sm mb-4">
+                Selecciona quién quedó más cerca del hoyo en este par 3
+              </p>
+              
+              <div className="space-y-2">
+                {players.map((player) => {
+                  const isWinner = currentOyesesWinner?.id === player.id;
+                  return (
+                    <Button
+                      key={player.id}
+                      onClick={() => onOyesesWinnerChange?.(player.id)}
+                      variant={isWinner ? "default" : "outline"}
+                      className={`w-full justify-between h-12 ${
+                        isWinner 
+                          ? 'bg-yellow-600 hover:bg-yellow-700 text-white border-yellow-500' 
+                          : 'bg-dark-surface border-gray-600 text-white hover:bg-dark-accent'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          isWinner ? 'bg-yellow-700' : 'bg-golf-blue'
+                        }`}>
+                          <span className="text-xs font-bold text-white">
+                            {player.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <span className="font-medium">{player.name}</span>
+                      </div>
+                      {isWinner && (
+                        <div className="flex items-center space-x-1">
+                          <Target className="h-4 w-4 text-yellow-200" />
+                          <span className="text-yellow-200 text-sm font-medium">
+                            +${bettingOptions.unitPerHole * players.length}
+                          </span>
+                        </div>
+                      )}
+                    </Button>
+                  );
+                })}
+              </div>
+              
+              {currentOyesesWinner && (
+                <div className="mt-4 p-3 bg-yellow-900/30 rounded-lg border border-yellow-700">
+                  <div className="flex items-center justify-center space-x-2">
+                    <Target className="h-4 w-4 text-yellow-400" />
+                    <span className="text-yellow-300 text-sm font-medium">
+                      {currentOyesesWinner.name} ganó ${bettingOptions.unitPerHole * players.length}
+                    </span>
                   </div>
                 </div>
               )}

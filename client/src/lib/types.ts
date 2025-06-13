@@ -37,6 +37,7 @@ export interface HoleScore {
   netScore: number;
   par: number;
   strokeIndex: number;
+  oyesesWinner?: string; // ID del jugador que ganó "Oyeses" (closest to pin) en este hoyo par 3
 }
 
 export interface BettingOptions {

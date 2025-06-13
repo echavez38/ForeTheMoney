@@ -161,6 +161,36 @@ export default function Scorecard() {
     setLocation('/dashboard');
   };
 
+  const handleOyesesWinnerChange = (winnerId: string) => {
+    if (!round || !currentHoleInfo) return;
+
+    const updatedRound = {
+      ...round,
+      players: round.players.map(player => ({
+        ...player,
+        scores: player.scores.map(score => {
+          if (score.holeNumber === round.currentHole) {
+            // Clear previous winner and set new winner
+            return {
+              ...score,
+              oyesesWinner: player.id === winnerId ? winnerId : undefined
+            };
+          }
+          return score;
+        })
+      }))
+    };
+
+    setRound(updatedRound);
+    StorageManager.setCurrentRound(updatedRound);
+    
+    const winnerName = round.players.find(p => p.id === winnerId)?.name;
+    toast({
+      title: "Oyeses registrado",
+      description: `${winnerName} ganó closest to pin`,
+    });
+  };
+
   const getCurrentHoleBetting = () => {
     if (!round || !currentHoleInfo) return [];
 
@@ -184,7 +214,12 @@ export default function Scorecard() {
       canGoPrev={round.currentHole > 1}
       onViewScorecard={handleViewScorecard}
       onAbandonRound={handleAbandonRound}
+      onOyesesWinnerChange={handleOyesesWinnerChange}
       gameFormats={round.gameFormats}
+      bettingOptions={{
+        oyeses: round.bettingOptions.oyeses,
+        unitPerHole: round.bettingOptions.unitPerHole
+      }}
     />
   );
 }
