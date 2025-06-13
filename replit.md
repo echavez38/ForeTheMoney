@@ -34,6 +34,18 @@ Mobile-optimized web application for golf scoring and betting calculations speci
   - All 18 holes with exact par, stroke index, and distances
   - Six tee positions (Negras, Azules, Blancas, Doradas, Plateadas, Rojas) with precise yardages
   - Data directly from club's official records
+- **ENHANCED TEE SYSTEM**: Separated Blancas into gender-specific options:
+  - Blancas (H) for men with specific handicap calculations
+  - Blancas (M) for women with different handicap adjustments
+  - Updated visual indicators with pink border for women's Blancas
+- **GAME FORMATS**: Added Stroke Play vs Match Play options:
+  - Stroke Play: Traditional total score counting
+  - Match Play: Hole-by-hole competition format
+- **SEGMENT BETTING**: Implemented betting by course segments:
+  - Front Nine (holes 1-9) betting
+  - Back Nine (holes 10-18) betting  
+  - Total 18-hole betting
+  - Each segment can be enabled/disabled independently
 
 ## User Preferences
 - Spanish language interface

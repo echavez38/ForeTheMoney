@@ -72,6 +72,7 @@ export const insertRoundSchema = createInsertSchema(rounds).pick({
   course: true,
   holes: true,
   currentHole: true,
+  gameFormat: true,
   bettingOptions: true,
 });
 

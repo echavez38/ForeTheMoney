@@ -3,7 +3,8 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { StorageManager } from '@/lib/storage';
-import { Round } from '@/lib/types';
+import { Round, DEFAULT_HOLES } from '@/lib/types';
+import { BettingCalculator } from '@/lib/betting';
 import { Home, RotateCcw, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -48,18 +49,21 @@ export default function Results() {
 
   if (!round) return null;
 
-  // Calculate betting breakdown
-  const bettingBreakdown = {
-    oyeses: { winner: '', amount: 0, holes: 0 },
-    skins: { winner: '', amount: 0, holes: 0 },
+  // Calculate segment betting results
+  const segmentResults = {
+    frontNine: round.bettingOptions.segments.frontNine ? 
+      BettingCalculator.calculateSegmentBetting(round, DEFAULT_HOLES, 'frontNine') : null,
+    backNine: round.bettingOptions.segments.backNine ? 
+      BettingCalculator.calculateSegmentBetting(round, DEFAULT_HOLES, 'backNine') : null,
+    total: round.bettingOptions.segments.total ? 
+      BettingCalculator.calculateSegmentBetting(round, DEFAULT_HOLES, 'total') : null,
   };
 
-  // Find the player with highest money balance for each betting type
-  const sortedByBalance = [...round.players].sort((a, b) => b.moneyBalance - a.moneyBalance);
-  if (sortedByBalance.length > 0 && sortedByBalance[0].moneyBalance > 0) {
-    bettingBreakdown.oyeses.winner = sortedByBalance[0].name;
-    bettingBreakdown.oyeses.amount = Math.abs(sortedByBalance[0].moneyBalance);
-  }
+  const getSegmentWinner = (balances: Record<string, number>) => {
+    const winner = Object.entries(balances).reduce((max, [id, amount]) => 
+      amount > max[1] ? [id, amount] : max, ['', 0]);
+    return winner[1] > 0 ? round.players.find(p => p.id === winner[0])?.name || '' : '';
+  };
 
   return (
     <div className="min-h-screen bg-dark-bg pb-6">
@@ -145,80 +149,164 @@ export default function Results() {
           </CardContent>
         </Card>
 
-        {/* Betting Breakdown */}
+        {/* Game Format & Betting Summary */}
         <Card className="bg-dark-surface border-gray-700">
           <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-4 text-white">Desglose de Apuestas</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">Resumen de Apuestas</h3>
+              <span className="px-3 py-1 bg-golf-blue rounded-full text-sm text-white">
+                {round.gameFormat === 'stroke' ? 'Stroke Play' : 'Match Play'}
+              </span>
+            </div>
             
             <div className="space-y-4">
-              {round.bettingOptions.oyeses && (
+              {/* Front Nine Results */}
+              {segmentResults.frontNine && (
                 <div className="p-4 bg-dark-card rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold flex items-center text-white">
-                      <i className="fas fa-crown text-yellow-500 mr-2"></i>
-                      Oyeses
-                    </h4>
-                    <span className="text-golf-green font-semibold">
-                      €{(round.bettingOptions.unitPerHole * round.holes).toFixed(2)}
-                    </span>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium text-white">Front Nine (Hoyos 1-9)</h4>
+                    <span className="text-sm text-gray-400">€{segmentResults.frontNine.totalPot.toFixed(2)}</span>
                   </div>
-                  <div className="text-sm text-gray-400">
-                    <div className="flex justify-between">
-                      <span>Unidad por hoyo: €{round.bettingOptions.unitPerHole}</span>
-                      <span>{round.holes} hoyos</span>
-                    </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    {Object.entries(segmentResults.frontNine.playerBalances).map(([playerId, amount]) => {
+                      const player = round.players.find(p => p.id === playerId);
+                      return player ? (
+                        <div key={playerId} className="flex items-center justify-between">
+                          <span className="text-white text-sm">{player.name}</span>
+                          <span className={`text-sm font-medium ${
+                            amount > 0 ? 'text-green-400' : amount < 0 ? 'text-red-400' : 'text-gray-400'
+                          }`}>
+                            {amount > 0 ? '+' : ''}€{amount.toFixed(2)}
+                          </span>
+                        </div>
+                      ) : null;
+                    })}
                   </div>
                 </div>
               )}
 
-              {round.bettingOptions.skins && (
+              {/* Back Nine Results */}
+              {segmentResults.backNine && (
                 <div className="p-4 bg-dark-card rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold flex items-center text-white">
-                      <i className="fas fa-fire text-orange-500 mr-2"></i>
-                      Skins
-                    </h4>
-                    <span className="text-golf-green font-semibold">Variable</span>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium text-white">Back Nine (Hoyos 10-18)</h4>
+                    <span className="text-sm text-gray-400">€{segmentResults.backNine.totalPot.toFixed(2)}</span>
                   </div>
-                  <div className="text-sm text-gray-400">
-                    <p>Basado en golpes únicos ganadores por hoyo</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    {Object.entries(segmentResults.backNine.playerBalances).map(([playerId, amount]) => {
+                      const player = round.players.find(p => p.id === playerId);
+                      return player ? (
+                        <div key={playerId} className="flex items-center justify-between">
+                          <span className="text-white text-sm">{player.name}</span>
+                          <span className={`text-sm font-medium ${
+                            amount > 0 ? 'text-green-400' : amount < 0 ? 'text-red-400' : 'text-gray-400'
+                          }`}>
+                            {amount > 0 ? '+' : ''}€{amount.toFixed(2)}
+                          </span>
+                        </div>
+                      ) : null;
+                    })}
                   </div>
                 </div>
               )}
 
-              {!round.bettingOptions.oyeses && !round.bettingOptions.skins && (
-                <div className="text-center text-gray-400 py-4">
-                  <p>No se configuraron apuestas para esta ronda</p>
+              {/* Total Results */}
+              {segmentResults.total && (
+                <div className="p-4 bg-dark-card rounded-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium text-white">Total (18 Hoyos)</h4>
+                    <span className="text-sm text-gray-400">€{segmentResults.total.totalPot.toFixed(2)}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    {Object.entries(segmentResults.total.playerBalances).map(([playerId, amount]) => {
+                      const player = round.players.find(p => p.id === playerId);
+                      return player ? (
+                        <div key={playerId} className="flex items-center justify-between">
+                          <span className="text-white text-sm">{player.name}</span>
+                          <span className={`text-sm font-medium ${
+                            amount > 0 ? 'text-green-400' : amount < 0 ? 'text-red-400' : 'text-gray-400'
+                          }`}>
+                            {amount > 0 ? '+' : ''}€{amount.toFixed(2)}
+                          </span>
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
                 </div>
               )}
+
+              {/* Individual Betting Options */}
+              <div className="pt-4 border-t border-gray-600">
+                <h4 className="font-medium text-white mb-3">Opciones Activas</h4>
+                <div className="flex flex-wrap gap-2">
+                  {round.bettingOptions.skins && (
+                    <span className="px-3 py-1 bg-blue-600 rounded-full text-xs text-white">Skins</span>
+                  )}
+                  {round.bettingOptions.oyeses && (
+                    <span className="px-3 py-1 bg-green-600 rounded-full text-xs text-white">Oyeses</span>
+                  )}
+                  {round.bettingOptions.foursomes && (
+                    <span className="px-3 py-1 bg-purple-600 rounded-full text-xs text-white">Foursomes</span>
+                  )}
+                  <span className="px-3 py-1 bg-gray-600 rounded-full text-xs text-white">
+                    €{round.bettingOptions.unitPerHole}/hoyo
+                  </span>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Actions */}
-        <div className="space-y-3">
+        {/* Tee Information */}
+        <Card className="bg-dark-surface border-gray-700">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4 text-white">Marcas de Salida Utilizadas</h3>
+            
+            <div className="space-y-3">
+              {round.players.map((player) => (
+                <div key={player.id} className="flex items-center justify-between p-3 bg-dark-card rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-golf-green rounded-full flex items-center justify-center">
+                      <span className="text-sm font-semibold text-white">
+                        {player.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <span className="font-medium text-white">{player.name}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-3 h-3 rounded-full ${
+                      player.selectedTee.color === 'negras' ? 'bg-black border border-gray-400' :
+                      player.selectedTee.color === 'azules' ? 'bg-blue-500' :
+                      player.selectedTee.color === 'blancas' ? 'bg-white border border-gray-400' :
+                      player.selectedTee.color === 'blancas_f' ? 'bg-white border-2 border-pink-400' :
+                      player.selectedTee.color === 'doradas' ? 'bg-yellow-400' :
+                      player.selectedTee.color === 'plateadas' ? 'bg-gray-400' :
+                      'bg-red-500'
+                    }`} />
+                    <span className="text-sm text-gray-300">{player.selectedTee.name}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Action Buttons */}
+        <div className="flex space-x-4">
           <Button
-            onClick={handleSaveRound}
-            className="w-full bg-golf-green text-white py-4 rounded-xl font-semibold hover:bg-golf-light transition-colors"
+            onClick={handleGoHome}
+            variant="outline"
+            className="flex-1 border-gray-600 text-white hover:bg-gray-700"
           >
-            <Save className="h-5 w-5 mr-2" />
-            Confirmar Guardado
+            <Home className="w-4 h-4 mr-2" />
+            Inicio
           </Button>
           <Button
             onClick={handleNewRound}
-            variant="outline"
-            className="w-full bg-dark-surface border-gray-600 text-white py-4 rounded-xl font-semibold hover:bg-dark-card transition-colors"
+            className="flex-1 bg-golf-green text-white hover:bg-golf-light"
           >
-            <RotateCcw className="h-5 w-5 mr-2" />
+            <RotateCcw className="w-4 h-4 mr-2" />
             Nueva Ronda
-          </Button>
-          <Button
-            onClick={handleGoHome}
-            variant="ghost"
-            className="w-full text-gray-400 py-3 font-semibold hover:text-white"
-          >
-            <Home className="h-5 w-5 mr-2" />
-            Volver al Inicio
           </Button>
         </div>
       </div>
