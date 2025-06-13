@@ -46,6 +46,11 @@ Mobile-optimized web application for golf scoring and betting calculations speci
   - Back Nine (holes 10-18) betting  
   - Total 18-hole betting
   - Each segment can be enabled/disabled independently
+- **DUAL FORMAT SYSTEM**: Enhanced game format selection:
+  - Stroke Play and Match Play can be selected simultaneously
+  - Independent calculations for each format when both enabled
+  - Separate results display for each format in results page
+  - Database schema updated to support dual formats
 
 ## User Preferences
 - Spanish language interface
