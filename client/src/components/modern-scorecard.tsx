@@ -175,6 +175,7 @@ export function ModernScorecard({
                       player.selectedTee.color === 'negras' ? 'bg-black border border-gray-400' :
                       player.selectedTee.color === 'azules' ? 'bg-blue-500' :
                       player.selectedTee.color === 'blancas' ? 'bg-white border border-gray-400' :
+                      player.selectedTee.color === 'blancas_f' ? 'bg-white border-2 border-pink-400' :
                       player.selectedTee.color === 'doradas' ? 'bg-yellow-400' :
                       player.selectedTee.color === 'plateadas' ? 'bg-gray-400' :
                       'bg-red-500'
