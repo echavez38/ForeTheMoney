@@ -54,6 +54,11 @@ export interface BettingOptions {
     backNine: number;
     total: number;
   };
+  matchPlayBets: {
+    frontNine: number;
+    backNine: number;
+    total: number;
+  };
 }
 
 export interface HoleInfo {

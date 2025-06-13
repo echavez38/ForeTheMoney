@@ -35,6 +35,11 @@ export default function CreateRound() {
       backNine: 10.0,
       total: 20.0,
     },
+    matchPlayBets: {
+      frontNine: 15.0,
+      backNine: 15.0,
+      total: 30.0,
+    },
   });
 
   const [newPlayerName, setNewPlayerName] = useState('');
@@ -392,7 +397,7 @@ export default function CreateRound() {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <label className="text-white">Unidad por hoyo (€)</label>
+                <label className="text-white">Unidad por hoyo ($)</label>
                 <Input
                   type="number"
                   value={bettingOptions.unitPerHole}
@@ -466,7 +471,7 @@ export default function CreateRound() {
               {/* Stroke Play Betting Values */}
               {gameFormats.strokePlay && (
                 <div className="pt-4 border-t border-gray-600">
-                  <h4 className="text-md font-medium mb-3 text-white">Valores de Apuesta - Stroke Play (€)</h4>
+                  <h4 className="text-md font-medium mb-3 text-white">Valores de Apuesta - Stroke Play ($)</h4>
                   <div className="space-y-3">
                     {bettingOptions.segments.frontNine && (
                       <div className="flex items-center justify-between">
@@ -521,6 +526,78 @@ export default function CreateRound() {
                               ...bettingOptions, 
                               strokePlayBets: {
                                 ...bettingOptions.strokePlayBets,
+                                total: parseFloat(e.target.value) || 0
+                              }
+                            })
+                          }
+                          min="0"
+                          step="5"
+                          className="w-20 bg-dark-card border-gray-600 text-white text-center"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Match Play Betting Values */}
+              {gameFormats.matchPlay && (
+                <div className="pt-4 border-t border-gray-600">
+                  <h4 className="text-md font-medium mb-3 text-white">Valores de Apuesta - Match Play ($)</h4>
+                  <div className="space-y-3">
+                    {bettingOptions.segments.frontNine && (
+                      <div className="flex items-center justify-between">
+                        <label className="text-white">Front Nine (Hoyos 1-9)</label>
+                        <Input
+                          type="number"
+                          value={bettingOptions.matchPlayBets.frontNine}
+                          onChange={(e) => 
+                            setBettingOptions({
+                              ...bettingOptions, 
+                              matchPlayBets: {
+                                ...bettingOptions.matchPlayBets,
+                                frontNine: parseFloat(e.target.value) || 0
+                              }
+                            })
+                          }
+                          min="0"
+                          step="5"
+                          className="w-20 bg-dark-card border-gray-600 text-white text-center"
+                        />
+                      </div>
+                    )}
+                    {bettingOptions.segments.backNine && (
+                      <div className="flex items-center justify-between">
+                        <label className="text-white">Back Nine (Hoyos 10-18)</label>
+                        <Input
+                          type="number"
+                          value={bettingOptions.matchPlayBets.backNine}
+                          onChange={(e) => 
+                            setBettingOptions({
+                              ...bettingOptions, 
+                              matchPlayBets: {
+                                ...bettingOptions.matchPlayBets,
+                                backNine: parseFloat(e.target.value) || 0
+                              }
+                            })
+                          }
+                          min="0"
+                          step="5"
+                          className="w-20 bg-dark-card border-gray-600 text-white text-center"
+                        />
+                      </div>
+                    )}
+                    {bettingOptions.segments.total && (
+                      <div className="flex items-center justify-between">
+                        <label className="text-white">Total (18 Hoyos)</label>
+                        <Input
+                          type="number"
+                          value={bettingOptions.matchPlayBets.total}
+                          onChange={(e) => 
+                            setBettingOptions({
+                              ...bettingOptions, 
+                              matchPlayBets: {
+                                ...bettingOptions.matchPlayBets,
                                 total: parseFloat(e.target.value) || 0
                               }
                             })

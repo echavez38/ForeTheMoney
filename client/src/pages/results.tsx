@@ -58,6 +58,11 @@ export default function Results() {
         frontNine: 10.0,
         backNine: 10.0,
         total: 20.0,
+      },
+      matchPlayBets: round.bettingOptions.matchPlayBets || {
+        frontNine: 15.0,
+        backNine: 15.0,
+        total: 30.0,
       }
     }
   };

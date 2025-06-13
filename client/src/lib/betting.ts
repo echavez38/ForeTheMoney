@@ -127,18 +127,47 @@ export class BettingCalculator {
         matchBalances[player.id] = 0;
       });
 
+      // Use specific match play bet amount for this segment
+      const unitValue = segment === 'frontNine' ? round.bettingOptions.matchPlayBets.frontNine :
+                       segment === 'backNine' ? round.bettingOptions.matchPlayBets.backNine :
+                       round.bettingOptions.matchPlayBets.total;
+
+      // Calculate hole-by-hole match play for the segment
+      let holesWonByPlayer: Record<string, number> = {};
+      round.players.forEach(player => {
+        holesWonByPlayer[player.id] = 0;
+      });
+
       segmentHoles.forEach(holeInfo => {
-        const holeResults = this.calculateHoleBetting(round.players, holeInfo, round.bettingOptions);
-        holeResults.forEach(result => {
-          if (result.winner && !result.tied) {
-            const winnerId = round.players.find(p => p.name === result.winner)?.id;
-            if (winnerId) {
-              matchBalances[winnerId] += result.amount;
-              matchPot += result.amount;
-            }
+        // Find who won this hole (lowest net score)
+        const holeWinners: string[] = [];
+        let bestScore = Infinity;
+        
+        round.players.forEach(player => {
+          const holeScore = player.scores.find(s => s.holeNumber === holeInfo.number);
+          if (holeScore && holeScore.netScore < bestScore) {
+            bestScore = holeScore.netScore;
+            holeWinners.length = 0;
+            holeWinners.push(player.id);
+          } else if (holeScore && holeScore.netScore === bestScore) {
+            holeWinners.push(player.id);
           }
         });
+
+        // Award hole wins (only if not tied)
+        if (holeWinners.length === 1) {
+          holesWonByPlayer[holeWinners[0]]++;
+        }
       });
+
+      // Determine segment winner and award prize
+      const maxHolesWon = Math.max(...Object.values(holesWonByPlayer));
+      const segmentWinners = Object.keys(holesWonByPlayer).filter(id => holesWonByPlayer[id] === maxHolesWon);
+      
+      if (segmentWinners.length === 1 && maxHolesWon > 0) {
+        matchBalances[segmentWinners[0]] += unitValue;
+        matchPot += unitValue;
+      }
 
       result.matchPlay = { playerBalances: matchBalances, totalPot: matchPot };
     }
