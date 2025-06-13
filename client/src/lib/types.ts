@@ -21,6 +21,7 @@ export interface RoundPlayer {
   id: string;
   name: string;
   handicap: number;
+  selectedTee: TeeSelection;
   scores: HoleScore[];
   grossTotal: number;
   netTotal: number;

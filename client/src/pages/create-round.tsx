@@ -40,6 +40,7 @@ export default function CreateRound() {
       id: userData.id,
       name: userData.name,
       handicap: userData.handicap,
+      selectedTee: TEE_OPTIONS[2], // Default to Blancas
     }]);
   }, [setLocation]);
 
@@ -66,6 +67,7 @@ export default function CreateRound() {
       id: Date.now().toString(),
       name: newPlayerName.trim(),
       handicap: parseInt(newPlayerHandicap) || 18,
+      selectedTee: TEE_OPTIONS[2], // Default to Blancas
     };
 
     setPlayers([...players, newPlayer]);
@@ -83,6 +85,14 @@ export default function CreateRound() {
       return;
     }
     setPlayers(players.filter(p => p.id !== playerId));
+  };
+
+  const updatePlayerTee = (playerId: string, tee: TeeSelection) => {
+    setPlayers(players.map(player => 
+      player.id === playerId 
+        ? { ...player, selectedTee: tee }
+        : player
+    ));
   };
 
   const startRound = () => {
