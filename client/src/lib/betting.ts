@@ -100,7 +100,10 @@ export class BettingCalculator {
         data.net < min[1].net ? [id, data] : min
       );
 
-      const unitValue = round.bettingOptions.unitPerHole * segmentHoles.length;
+      // Use specific stroke play bet amount for this segment
+      const unitValue = segment === 'frontNine' ? round.bettingOptions.strokePlayBets.frontNine :
+                       segment === 'backNine' ? round.bettingOptions.strokePlayBets.backNine :
+                       round.bettingOptions.strokePlayBets.total;
       
       // Award winnings
       if (grossWinner[0] !== netWinner[0]) {

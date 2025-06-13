@@ -30,6 +30,11 @@ export default function CreateRound() {
       backNine: true,
       total: true,
     },
+    strokePlayBets: {
+      frontNine: 10.0,
+      backNine: 10.0,
+      total: 20.0,
+    },
   });
 
   const [newPlayerName, setNewPlayerName] = useState('');
@@ -457,6 +462,78 @@ export default function CreateRound() {
                   </div>
                 </div>
               </div>
+
+              {/* Stroke Play Betting Values */}
+              {gameFormats.strokePlay && (
+                <div className="pt-4 border-t border-gray-600">
+                  <h4 className="text-md font-medium mb-3 text-white">Valores de Apuesta - Stroke Play (€)</h4>
+                  <div className="space-y-3">
+                    {bettingOptions.segments.frontNine && (
+                      <div className="flex items-center justify-between">
+                        <label className="text-white">Front Nine (Hoyos 1-9)</label>
+                        <Input
+                          type="number"
+                          value={bettingOptions.strokePlayBets.frontNine}
+                          onChange={(e) => 
+                            setBettingOptions({
+                              ...bettingOptions, 
+                              strokePlayBets: {
+                                ...bettingOptions.strokePlayBets,
+                                frontNine: parseFloat(e.target.value) || 0
+                              }
+                            })
+                          }
+                          min="0"
+                          step="5"
+                          className="w-20 bg-dark-card border-gray-600 text-white text-center"
+                        />
+                      </div>
+                    )}
+                    {bettingOptions.segments.backNine && (
+                      <div className="flex items-center justify-between">
+                        <label className="text-white">Back Nine (Hoyos 10-18)</label>
+                        <Input
+                          type="number"
+                          value={bettingOptions.strokePlayBets.backNine}
+                          onChange={(e) => 
+                            setBettingOptions({
+                              ...bettingOptions, 
+                              strokePlayBets: {
+                                ...bettingOptions.strokePlayBets,
+                                backNine: parseFloat(e.target.value) || 0
+                              }
+                            })
+                          }
+                          min="0"
+                          step="5"
+                          className="w-20 bg-dark-card border-gray-600 text-white text-center"
+                        />
+                      </div>
+                    )}
+                    {bettingOptions.segments.total && (
+                      <div className="flex items-center justify-between">
+                        <label className="text-white">Total (18 Hoyos)</label>
+                        <Input
+                          type="number"
+                          value={bettingOptions.strokePlayBets.total}
+                          onChange={(e) => 
+                            setBettingOptions({
+                              ...bettingOptions, 
+                              strokePlayBets: {
+                                ...bettingOptions.strokePlayBets,
+                                total: parseFloat(e.target.value) || 0
+                              }
+                            })
+                          }
+                          min="0"
+                          step="5"
+                          className="w-20 bg-dark-card border-gray-600 text-white text-center"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

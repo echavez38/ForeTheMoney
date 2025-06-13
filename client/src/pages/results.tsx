@@ -49,14 +49,27 @@ export default function Results() {
 
   if (!round) return null;
 
+  // Add backward compatibility for rounds without strokePlayBets
+  const roundWithBets = {
+    ...round,
+    bettingOptions: {
+      ...round.bettingOptions,
+      strokePlayBets: round.bettingOptions.strokePlayBets || {
+        frontNine: 10.0,
+        backNine: 10.0,
+        total: 20.0,
+      }
+    }
+  };
+
   // Calculate segment betting results
   const segmentResults = {
-    frontNine: round.bettingOptions.segments.frontNine ? 
-      BettingCalculator.calculateSegmentBetting(round, DEFAULT_HOLES, 'frontNine') : null,
-    backNine: round.bettingOptions.segments.backNine ? 
-      BettingCalculator.calculateSegmentBetting(round, DEFAULT_HOLES, 'backNine') : null,
-    total: round.bettingOptions.segments.total ? 
-      BettingCalculator.calculateSegmentBetting(round, DEFAULT_HOLES, 'total') : null,
+    frontNine: roundWithBets.bettingOptions.segments.frontNine ? 
+      BettingCalculator.calculateSegmentBetting(roundWithBets, DEFAULT_HOLES, 'frontNine') : null,
+    backNine: roundWithBets.bettingOptions.segments.backNine ? 
+      BettingCalculator.calculateSegmentBetting(roundWithBets, DEFAULT_HOLES, 'backNine') : null,
+    total: roundWithBets.bettingOptions.segments.total ? 
+      BettingCalculator.calculateSegmentBetting(roundWithBets, DEFAULT_HOLES, 'total') : null,
   };
 
   const getSegmentWinner = (balances: Record<string, number>) => {
