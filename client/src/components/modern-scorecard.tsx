@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { RoundPlayer, HoleInfo, TeeSelection } from '@/lib/types';
-import { ChevronLeft, ChevronRight, RotateCw, Target, TrendingUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCw, Target, TrendingUp, CreditCard } from 'lucide-react';
 
 interface ModernScorecardProps {
   players: RoundPlayer[];
@@ -12,6 +12,7 @@ interface ModernScorecardProps {
   onNavigate: (direction: 'prev' | 'next') => void;
   canGoNext: boolean;
   canGoPrev: boolean;
+  onViewScorecard?: () => void;
 }
 
 export function ModernScorecard({ 
@@ -21,7 +22,8 @@ export function ModernScorecard({
   onScoreChange,
   onNavigate,
   canGoNext,
-  canGoPrev
+  canGoPrev,
+  onViewScorecard
 }: ModernScorecardProps) {
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
 
