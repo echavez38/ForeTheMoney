@@ -138,7 +138,6 @@ export default function Scorecard() {
 
     return BettingCalculator.calculateHoleBetting(
       round.players,
-      round.currentHole,
       currentHoleInfo,
       round.bettingOptions
     );

@@ -16,6 +16,7 @@ export const rounds = pgTable("rounds", {
   course: text("course").notNull(),
   holes: integer("holes").notNull(),
   currentHole: integer("current_hole").default(1),
+  gameFormat: text("game_format").notNull().default("stroke"),
   bettingOptions: jsonb("betting_options").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   completed: boolean("completed").default(false),

@@ -401,6 +401,61 @@ export default function CreateRound() {
                   className="w-20 bg-dark-card border-gray-600 text-white text-center"
                 />
               </div>
+              
+              {/* Betting Segments */}
+              <div className="pt-4 border-t border-gray-600">
+                <h4 className="text-md font-medium mb-3 text-white">Apuestas por Segmento</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-white">Front Nine (Hoyos 1-9)</label>
+                    <Checkbox
+                      checked={bettingOptions.segments.frontNine}
+                      onCheckedChange={(checked) => 
+                        setBettingOptions({
+                          ...bettingOptions, 
+                          segments: {
+                            ...bettingOptions.segments,
+                            frontNine: checked as boolean
+                          }
+                        })
+                      }
+                      className="border-gray-600"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-white">Back Nine (Hoyos 10-18)</label>
+                    <Checkbox
+                      checked={bettingOptions.segments.backNine}
+                      onCheckedChange={(checked) => 
+                        setBettingOptions({
+                          ...bettingOptions, 
+                          segments: {
+                            ...bettingOptions.segments,
+                            backNine: checked as boolean
+                          }
+                        })
+                      }
+                      className="border-gray-600"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-white">Total (18 Hoyos)</label>
+                    <Checkbox
+                      checked={bettingOptions.segments.total}
+                      onCheckedChange={(checked) => 
+                        setBettingOptions({
+                          ...bettingOptions, 
+                          segments: {
+                            ...bettingOptions.segments,
+                            total: checked as boolean
+                          }
+                        })
+                      }
+                      className="border-gray-600"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
