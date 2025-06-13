@@ -66,8 +66,21 @@ export function ModernScorecard({
             </div>
           </div>
           
-          <div className="bg-golf-blue rounded-full w-12 h-12 flex items-center justify-center">
-            <span className="text-white font-bold text-lg">{holeInfo.par}</span>
+          <div className="flex items-center space-x-3">
+            {onViewScorecard && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onViewScorecard}
+                className="p-2 text-white hover:bg-dark-accent"
+                title="Ver Tarjeta de Golf"
+              >
+                <CreditCard className="h-5 w-5" />
+              </Button>
+            )}
+            <div className="bg-golf-blue rounded-full w-12 h-12 flex items-center justify-center">
+              <span className="text-white font-bold text-lg">{holeInfo.par}</span>
+            </div>
           </div>
         </div>
       </div>

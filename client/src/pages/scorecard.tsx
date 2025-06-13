@@ -133,6 +133,10 @@ export default function Scorecard() {
     setLocation('/results');
   };
 
+  const handleViewScorecard = () => {
+    setLocation('/golf-scorecard');
+  };
+
   const getCurrentHoleBetting = () => {
     if (!round || !currentHoleInfo) return [];
 
@@ -154,6 +158,7 @@ export default function Scorecard() {
       onNavigate={handleNavigation}
       canGoNext={true}
       canGoPrev={round.currentHole > 1}
+      onViewScorecard={handleViewScorecard}
     />
   );
 }

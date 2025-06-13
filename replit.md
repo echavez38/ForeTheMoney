@@ -51,6 +51,12 @@ Mobile-optimized web application for golf scoring and betting calculations speci
   - Independent calculations for each format when both enabled
   - Separate results display for each format in results page
   - Database schema updated to support dual formats
+- **PROFESSIONAL GOLF SCORECARD**: Added authentic golf scorecard view:
+  - Two-section layout (OUT/IN) matching real golf scorecards
+  - Displays yardages and handicaps per player's selected tee
+  - Shows gross/net scores with proper golf formatting
+  - Accessible via card icon button during gameplay
+  - Complete summary with money balances and performance statistics
 
 ## User Preferences
 - Spanish language interface
