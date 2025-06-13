@@ -154,34 +154,71 @@ export default function Results() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-white">Resumen de Apuestas</h3>
-              <span className="px-3 py-1 bg-golf-blue rounded-full text-sm text-white">
-                {round.gameFormat === 'stroke' ? 'Stroke Play' : 'Match Play'}
-              </span>
+              <div className="flex gap-2">
+                {round.gameFormats.strokePlay && (
+                  <span className="px-3 py-1 bg-blue-600 rounded-full text-sm text-white">Stroke Play</span>
+                )}
+                {round.gameFormats.matchPlay && (
+                  <span className="px-3 py-1 bg-green-600 rounded-full text-sm text-white">Match Play</span>
+                )}
+              </div>
             </div>
             
             <div className="space-y-4">
               {/* Front Nine Results */}
               {segmentResults.frontNine && (
                 <div className="p-4 bg-dark-card rounded-lg">
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-medium text-white">Front Nine (Hoyos 1-9)</h4>
-                    <span className="text-sm text-gray-400">€{segmentResults.frontNine.totalPot.toFixed(2)}</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    {Object.entries(segmentResults.frontNine.playerBalances).map(([playerId, amount]) => {
-                      const player = round.players.find(p => p.id === playerId);
-                      return player ? (
-                        <div key={playerId} className="flex items-center justify-between">
-                          <span className="text-white text-sm">{player.name}</span>
-                          <span className={`text-sm font-medium ${
-                            amount > 0 ? 'text-green-400' : amount < 0 ? 'text-red-400' : 'text-gray-400'
-                          }`}>
-                            {amount > 0 ? '+' : ''}€{amount.toFixed(2)}
-                          </span>
-                        </div>
-                      ) : null;
-                    })}
-                  </div>
+                  <h4 className="font-medium text-white mb-3">Front Nine (Hoyos 1-9)</h4>
+                  
+                  {/* Stroke Play Results */}
+                  {segmentResults.frontNine.strokePlay && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-blue-400 font-medium">Stroke Play</span>
+                        <span className="text-sm text-gray-400">€{segmentResults.frontNine.strokePlay.totalPot.toFixed(2)}</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {Object.entries(segmentResults.frontNine.strokePlay.playerBalances).map(([playerId, amount]) => {
+                          const player = round.players.find(p => p.id === playerId);
+                          return player ? (
+                            <div key={`stroke-${playerId}`} className="flex items-center justify-between">
+                              <span className="text-white text-sm">{player.name}</span>
+                              <span className={`text-sm font-medium ${
+                                amount > 0 ? 'text-green-400' : amount < 0 ? 'text-red-400' : 'text-gray-400'
+                              }`}>
+                                {amount > 0 ? '+' : ''}€{amount.toFixed(2)}
+                              </span>
+                            </div>
+                          ) : null;
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Match Play Results */}
+                  {segmentResults.frontNine.matchPlay && (
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-green-400 font-medium">Match Play</span>
+                        <span className="text-sm text-gray-400">€{segmentResults.frontNine.matchPlay.totalPot.toFixed(2)}</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {Object.entries(segmentResults.frontNine.matchPlay.playerBalances).map(([playerId, amount]) => {
+                          const player = round.players.find(p => p.id === playerId);
+                          return player ? (
+                            <div key={`match-${playerId}`} className="flex items-center justify-between">
+                              <span className="text-white text-sm">{player.name}</span>
+                              <span className={`text-sm font-medium ${
+                                amount > 0 ? 'text-green-400' : amount < 0 ? 'text-red-400' : 'text-gray-400'
+                              }`}>
+                                {amount > 0 ? '+' : ''}€{amount.toFixed(2)}
+                              </span>
+                            </div>
+                          ) : null;
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 

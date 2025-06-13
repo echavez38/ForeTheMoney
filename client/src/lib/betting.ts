@@ -64,19 +64,21 @@ export class BettingCalculator {
     holes: HoleInfo[],
     segment: 'frontNine' | 'backNine' | 'total'
   ): { strokePlay?: { playerBalances: Record<string, number>; totalPot: number }; matchPlay?: { playerBalances: Record<string, number>; totalPot: number } } {
-    const playerBalances: Record<string, number> = {};
-    let totalPot = 0;
-
-    round.players.forEach(player => {
-      playerBalances[player.id] = 0;
-    });
+    const result: { strokePlay?: { playerBalances: Record<string, number>; totalPot: number }; matchPlay?: { playerBalances: Record<string, number>; totalPot: number } } = {};
 
     const segmentHoles = segment === 'frontNine' ? holes.slice(0, 9) :
                         segment === 'backNine' ? holes.slice(9, 18) :
                         holes;
 
-    if (round.gameFormat === 'stroke') {
-      // Stroke play - calculate total scores for segment
+    // Calculate Stroke Play if enabled
+    if (round.gameFormats.strokePlay) {
+      const strokeBalances: Record<string, number> = {};
+      let strokePot = 0;
+
+      round.players.forEach(player => {
+        strokeBalances[player.id] = 0;
+      });
+
       const playerTotals: Record<string, { gross: number; net: number; name: string }> = {};
       
       round.players.forEach(player => {
@@ -102,30 +104,43 @@ export class BettingCalculator {
       
       // Award winnings
       if (grossWinner[0] !== netWinner[0]) {
-        playerBalances[grossWinner[0]] += unitValue;
-        playerBalances[netWinner[0]] += unitValue;
-        totalPot += unitValue * 2;
+        strokeBalances[grossWinner[0]] += unitValue;
+        strokeBalances[netWinner[0]] += unitValue;
+        strokePot += unitValue * 2;
       } else {
-        playerBalances[grossWinner[0]] += unitValue * 2;
-        totalPot += unitValue * 2;
+        strokeBalances[grossWinner[0]] += unitValue * 2;
+        strokePot += unitValue * 2;
       }
-    } else {
-      // Match play - hole by hole
+
+      result.strokePlay = { playerBalances: strokeBalances, totalPot: strokePot };
+    }
+
+    // Calculate Match Play if enabled
+    if (round.gameFormats.matchPlay) {
+      const matchBalances: Record<string, number> = {};
+      let matchPot = 0;
+
+      round.players.forEach(player => {
+        matchBalances[player.id] = 0;
+      });
+
       segmentHoles.forEach(holeInfo => {
         const holeResults = this.calculateHoleBetting(round.players, holeInfo, round.bettingOptions);
         holeResults.forEach(result => {
           if (result.winner && !result.tied) {
             const winnerId = round.players.find(p => p.name === result.winner)?.id;
             if (winnerId) {
-              playerBalances[winnerId] += result.amount;
-              totalPot += result.amount;
+              matchBalances[winnerId] += result.amount;
+              matchPot += result.amount;
             }
           }
         });
       });
+
+      result.matchPlay = { playerBalances: matchBalances, totalPot: matchPot };
     }
 
-    return { playerBalances, totalPot };
+    return result;
   }
 
   static calculateTotalBetting(
