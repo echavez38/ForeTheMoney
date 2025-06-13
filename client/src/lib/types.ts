@@ -67,26 +67,26 @@ export interface BettingResult {
   tied: boolean;
 }
 
-// Club Campestre de Puebla - Datos de la tarjeta oficial
+// Club Campestre de Puebla - Datos oficiales del campo
 export const CAMPESTRE_PUEBLA_HOLES: HoleInfo[] = [
-  { number: 1, par: 4, strokeIndex: 12, distances: { doradas: 326, azules: 356, blancas: 393, rojas: 417 } },
-  { number: 2, par: 4, strokeIndex: 6, distances: { doradas: 329, azules: 354, blancas: 383, rojas: 404 } },
-  { number: 3, par: 4, strokeIndex: 14, distances: { doradas: 248, azules: 279, blancas: 315, rojas: 347 } },
-  { number: 4, par: 3, strokeIndex: 16, distances: { doradas: 115, azules: 137, blancas: 159, rojas: 184 } },
-  { number: 5, par: 4, strokeIndex: 4, distances: { doradas: 278, azules: 312, blancas: 350, rojas: 378 } },
-  { number: 6, par: 5, strokeIndex: 10, distances: { doradas: 424, azules: 463, blancas: 510, rojas: 545 } },
-  { number: 7, par: 3, strokeIndex: 18, distances: { doradas: 125, azules: 142, blancas: 162, rojas: 185 } },
-  { number: 8, par: 4, strokeIndex: 2, distances: { doradas: 284, azules: 319, blancas: 358, rojas: 387 } },
-  { number: 9, par: 5, strokeIndex: 8, distances: { doradas: 424, azules: 463, blancas: 510, rojas: 545 } },
-  { number: 10, par: 4, strokeIndex: 3, distances: { doradas: 315, azules: 342, blancas: 374, rojas: 396 } },
-  { number: 11, par: 5, strokeIndex: 7, distances: { doradas: 417, azules: 449, blancas: 488, rojas: 517 } },
-  { number: 12, par: 3, strokeIndex: 17, distances: { doradas: 113, azules: 135, blancas: 159, rojas: 182 } },
-  { number: 13, par: 4, strokeIndex: 1, distances: { doradas: 298, azules: 323, blancas: 354, rojas: 378 } },
-  { number: 14, par: 4, strokeIndex: 15, distances: { doradas: 283, azules: 310, blancas: 342, rojas: 368 } },
-  { number: 15, par: 5, strokeIndex: 9, distances: { doradas: 407, azules: 439, blancas: 478, rojas: 507 } },
-  { number: 16, par: 3, strokeIndex: 13, distances: { doradas: 134, azules: 155, blancas: 178, rojas: 201 } },
-  { number: 17, par: 4, strokeIndex: 5, distances: { doradas: 301, azules: 328, blancas: 359, rojas: 383 } },
-  { number: 18, par: 4, strokeIndex: 11, distances: { doradas: 302, azules: 329, blancas: 360, rojas: 384 } },
+  { number: 1, par: 4, strokeIndex: 11, distances: { doradas: 263, azules: 285, blancas: 310, rojas: 334 } },
+  { number: 2, par: 4, strokeIndex: 5, distances: { doradas: 283, azules: 307, blancas: 334, rojas: 361 } },
+  { number: 3, par: 3, strokeIndex: 17, distances: { doradas: 108, azules: 117, blancas: 127, rojas: 137 } },
+  { number: 4, par: 5, strokeIndex: 1, distances: { doradas: 396, azules: 429, blancas: 467, rojas: 504 } },
+  { number: 5, par: 4, strokeIndex: 7, distances: { doradas: 270, azules: 293, blancas: 319, rojas: 345 } },
+  { number: 6, par: 4, strokeIndex: 13, distances: { doradas: 244, azules: 264, blancas: 287, rojas: 310 } },
+  { number: 7, par: 3, strokeIndex: 15, distances: { doradas: 119, azules: 129, blancas: 140, rojas: 151 } },
+  { number: 8, par: 5, strokeIndex: 3, distances: { doradas: 396, azules: 429, blancas: 467, rojas: 504 } },
+  { number: 9, par: 4, strokeIndex: 9, distances: { doradas: 297, azules: 322, blancas: 351, rojas: 379 } },
+  { number: 10, par: 4, strokeIndex: 6, distances: { doradas: 274, azules: 297, blancas: 323, rojas: 349 } },
+  { number: 11, par: 4, strokeIndex: 12, distances: { doradas: 257, azules: 278, blancas: 303, rojas: 327 } },
+  { number: 12, par: 3, strokeIndex: 18, distances: { doradas: 87, azules: 94, blancas: 102, rojas: 110 } },
+  { number: 13, par: 5, strokeIndex: 2, distances: { doradas: 402, azules: 436, blancas: 475, rojas: 513 } },
+  { number: 14, par: 4, strokeIndex: 8, distances: { doradas: 290, azules: 314, blancas: 342, rojas: 370 } },
+  { number: 15, par: 4, strokeIndex: 4, distances: { doradas: 315, azules: 341, blancas: 371, rojas: 401 } },
+  { number: 16, par: 3, strokeIndex: 16, distances: { doradas: 117, azules: 127, blancas: 138, rojas: 149 } },
+  { number: 17, par: 5, strokeIndex: 10, distances: { doradas: 374, azules: 405, blancas: 441, rojas: 477 } },
+  { number: 18, par: 4, strokeIndex: 14, distances: { doradas: 273, azules: 296, blancas: 322, rojas: 348 } },
 ];
 
 export const DEFAULT_HOLES = CAMPESTRE_PUEBLA_HOLES;

@@ -14,7 +14,7 @@ export default function CreateRound() {
   const [, setLocation] = useLocation();
   const [user, setUser] = useState<User | null>(null);
   const [holes, setHoles] = useState<9 | 18>(18);
-  const [course, setCourse] = useState('');
+  const [course, setCourse] = useState('Club Campestre de Puebla');
   const [players, setPlayers] = useState<Omit<RoundPlayer, 'scores' | 'grossTotal' | 'netTotal' | 'moneyBalance'>[]>([]);
   const [bettingOptions, setBettingOptions] = useState<BettingOptions>({
     skins: false,
@@ -189,10 +189,6 @@ export default function CreateRound() {
               </SelectTrigger>
               <SelectContent className="bg-dark-card border-gray-600">
                 <SelectItem value="Club Campestre de Puebla">Club Campestre de Puebla</SelectItem>
-                <SelectItem value="Club de Golf Las Brisas">Club de Golf Las Brisas</SelectItem>
-                <SelectItem value="Real Club de Golf">Real Club de Golf</SelectItem>
-                <SelectItem value="Golf La Moraleja">Golf La Moraleja</SelectItem>
-                <SelectItem value="Club de Campo Villa de Madrid">Club de Campo Villa de Madrid</SelectItem>
               </SelectContent>
             </Select>
           </CardContent>
