@@ -35,28 +35,16 @@ export default function RoundDebrief() {
 
   if (!round) return null;
 
-  // Calculate final money distribution from player balances
-  const calculateSegmentResults = () => {
-    const frontNineBalances: Record<string, number> = {};
-    const backNineBalances: Record<string, number> = {};
-    const totalBalances: Record<string, number> = {};
-    
-    round.players.forEach(player => {
-      // For now, use the final money balance distributed proportionally
-      const totalBalance = player.moneyBalance;
-      frontNineBalances[player.id] = totalBalance * 0.3; // 30% for front nine
-      backNineBalances[player.id] = totalBalance * 0.3;  // 30% for back nine  
-      totalBalances[player.id] = totalBalance * 0.4;     // 40% for total round
-    });
+  // Calculate betting results for each segment using the corrected betting calculator
+  const frontNineResults = BettingCalculator.calculateSegmentBetting(round, 'frontNine');
+  const backNineResults = BettingCalculator.calculateSegmentBetting(round, 'backNine');
+  const totalResults = BettingCalculator.calculateSegmentBetting(round, 'total');
 
-    return {
-      frontNine: { playerBalances: frontNineBalances, totalPot: Object.values(frontNineBalances).reduce((sum, val) => sum + Math.abs(val), 0) },
-      backNine: { playerBalances: backNineBalances, totalPot: Object.values(backNineBalances).reduce((sum, val) => sum + Math.abs(val), 0) },
-      total: { playerBalances: totalBalances, totalPot: Object.values(totalBalances).reduce((sum, val) => sum + Math.abs(val), 0) }
-    };
+  const bettingResults = {
+    frontNine: frontNineResults,
+    backNine: backNineResults,
+    total: totalResults
   };
-
-  const bettingResults = calculateSegmentResults();
 
   // Get winner and performance stats
   const sortedPlayers = [...round.players].sort((a, b) => a.netTotal - b.netTotal);
@@ -259,6 +247,59 @@ export default function RoundDebrief() {
                 </div>
               </div>
             </div>
+
+            {/* Format-Specific Details */}
+            {round.gameFormats.strokePlay && (
+              <div className="p-4 bg-blue-900/30 rounded-lg border border-blue-700">
+                <h4 className="font-medium text-blue-200 mb-3">Detalles Stroke Play</h4>
+                <div className="space-y-2 text-sm">
+                  {frontNineResults.strokePlayResults && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Front Nine:</span>
+                      <span className="text-blue-200">${frontNineResults.strokePlayResults.totalPot}</span>
+                    </div>
+                  )}
+                  {backNineResults.strokePlayResults && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Back Nine:</span>
+                      <span className="text-blue-200">${backNineResults.strokePlayResults.totalPot}</span>
+                    </div>
+                  )}
+                  {totalResults.strokePlayResults && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Total:</span>
+                      <span className="text-blue-200">${totalResults.strokePlayResults.totalPot}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {round.gameFormats.matchPlay && (
+              <div className="p-4 bg-yellow-900/30 rounded-lg border border-yellow-700">
+                <h4 className="font-medium text-yellow-200 mb-3">Detalles Match Play</h4>
+                <div className="space-y-2 text-sm">
+                  {frontNineResults.matchPlayResults && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Front Nine:</span>
+                      <span className="text-yellow-200">${frontNineResults.matchPlayResults.totalPot}</span>
+                    </div>
+                  )}
+                  {backNineResults.matchPlayResults && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Back Nine:</span>
+                      <span className="text-yellow-200">${backNineResults.matchPlayResults.totalPot}</span>
+                    </div>
+                  )}
+                  {totalResults.matchPlayResults && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Total:</span>
+                      <span className="text-yellow-200">${totalResults.matchPlayResults.totalPot}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

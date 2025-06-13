@@ -1,4 +1,4 @@
-import { RoundPlayer, HoleInfo, BettingResult, BettingOptions, TeeSelection } from './types';
+import { HoleInfo, RoundPlayer, BettingOptions, BettingResult } from './types';
 
 export class BettingCalculator {
   static calculateNetScore(
@@ -6,8 +6,7 @@ export class BettingCalculator {
     playerHandicap: number,
     holeStrokeIndex: number
   ): number {
-    const strokesReceived = Math.floor(playerHandicap / 18) + 
-      (holeStrokeIndex <= (playerHandicap % 18) ? 1 : 0);
+    const strokesReceived = this.getStrokesReceived(playerHandicap, holeStrokeIndex);
     return grossScore - strokesReceived;
   }
 
@@ -18,40 +17,24 @@ export class BettingCalculator {
   ): BettingResult[] {
     const results: BettingResult[] = [];
 
-    // Get scores for this hole
-    const holeScores = players.map(player => {
-      const score = player.scores.find(s => s.holeNumber === holeInfo.number);
-      return {
-        player,
-        grossScore: score?.grossScore || 0,
-        netScore: score?.netScore || 0,
-      };
-    }).filter(s => s.grossScore > 0);
-
-    if (holeScores.length === 0) return results;
-
-    // Calculate Oyeses (best net score)
-    if (bettingOptions.oyeses) {
-      const bestNet = Math.min(...holeScores.map(s => s.netScore));
-      const winners = holeScores.filter(s => s.netScore === bestNet);
-      
-      results.push({
-        type: 'oyeses',
-        winner: winners.length === 1 ? winners[0].player.name : null,
-        amount: winners.length === 1 ? bettingOptions.unitPerHole : 0,
-        tied: winners.length > 1,
-      });
-    }
-
-    // Calculate Skins (unique best net score)
     if (bettingOptions.skins) {
-      const bestNet = Math.min(...holeScores.map(s => s.netScore));
-      const winners = holeScores.filter(s => s.netScore === bestNet);
+      // Get net scores for all players on this hole
+      const holeScores = players.map(player => {
+        const score = player.scores.find(s => s.holeNumber === holeInfo.number);
+        return {
+          player,
+          netScore: score ? score.netScore : 999
+        };
+      }).sort((a, b) => a.netScore - b.netScore);
+
+      // Find winners (lowest net score)
+      const winningScore = holeScores[0].netScore;
+      const winners = holeScores.filter(h => h.netScore === winningScore);
       
       results.push({
         type: 'skins',
         winner: winners.length === 1 ? winners[0].player.name : null,
-        amount: winners.length === 1 ? bettingOptions.unitPerHole * 2 : 0,
+        amount: winners.length === 1 ? bettingOptions.unitPerHole * players.length : 0,
         tied: winners.length > 1,
       });
     }
@@ -63,124 +46,186 @@ export class BettingCalculator {
     round: { players: RoundPlayer[]; bettingOptions: BettingOptions; gameFormats: { strokePlay: boolean; matchPlay: boolean } },
     segment: 'frontNine' | 'backNine' | 'total'
   ): { 
-    strokePlay?: { 
-      frontNine?: { playerBalances: Record<string, number>; totalPot: number };
-      backNine?: { playerBalances: Record<string, number>; totalPot: number };
-      total?: { playerBalances: Record<string, number>; totalPot: number };
-    }; 
-    matchPlay?: { 
-      frontNine?: { playerBalances: Record<string, number>; totalPot: number };
-      backNine?: { playerBalances: Record<string, number>; totalPot: number };
-      total?: { playerBalances: Record<string, number>; totalPot: number };
-    } 
+    playerBalances: Record<string, number>; 
+    totalPot: number;
+    strokePlayResults?: { playerBalances: Record<string, number>; totalPot: number };
+    matchPlayResults?: { playerBalances: Record<string, number>; totalPot: number };
   } {
-    const result: { strokePlay?: { playerBalances: Record<string, number>; totalPot: number }; matchPlay?: { playerBalances: Record<string, number>; totalPot: number } } = {};
+    const combinedBalances: Record<string, number> = {};
+    let totalPot = 0;
+    
+    // Initialize combined balances
+    round.players.forEach(player => {
+      combinedBalances[player.id] = 0;
+    });
 
-    const segmentHoles = segment === 'frontNine' ? holes.slice(0, 9) :
-                        segment === 'backNine' ? holes.slice(9, 18) :
-                        holes;
+    const result: {
+      playerBalances: Record<string, number>;
+      totalPot: number;
+      strokePlayResults?: { playerBalances: Record<string, number>; totalPot: number };
+      matchPlayResults?: { playerBalances: Record<string, number>; totalPot: number };
+    } = {
+      playerBalances: combinedBalances,
+      totalPot: 0
+    };
 
-    // Calculate Stroke Play if enabled
-    if (round.gameFormats.strokePlay) {
+    // Define hole numbers for each segment
+    const segmentHoles = segment === 'frontNine' ? [1,2,3,4,5,6,7,8,9] :
+                        segment === 'backNine' ? [10,11,12,13,14,15,16,17,18] :
+                        [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18];
+
+    // Calculate Stroke Play if enabled and segment is active
+    if (round.gameFormats.strokePlay && round.bettingOptions.segments[segment]) {
       const strokeBalances: Record<string, number> = {};
-      let strokePot = 0;
-
       round.players.forEach(player => {
         strokeBalances[player.id] = 0;
       });
 
-      const playerTotals: Record<string, { gross: number; net: number; name: string }> = {};
-      
-      round.players.forEach(player => {
-        const segmentScores = player.scores.filter(score => 
-          segmentHoles.some(hole => hole.number === score.holeNumber)
-        );
-        
-        const grossTotal = segmentScores.reduce((sum, score) => sum + score.grossScore, 0);
-        const netTotal = segmentScores.reduce((sum, score) => sum + score.netScore, 0);
-        
-        playerTotals[player.id] = { gross: grossTotal, net: netTotal, name: player.name };
-      });
-
-      // Find winners for gross and net
-      const grossWinner = Object.entries(playerTotals).reduce((min, [id, data]) => 
-        data.gross < min[1].gross ? [id, data] : min
-      );
-      const netWinner = Object.entries(playerTotals).reduce((min, [id, data]) => 
-        data.net < min[1].net ? [id, data] : min
-      );
-
-      // Use specific stroke play bet amount for this segment
-      const unitValue = segment === 'frontNine' ? round.bettingOptions.strokePlayBets.frontNine :
+      // Get bet amount for this segment
+      const betAmount = segment === 'frontNine' ? round.bettingOptions.strokePlayBets.frontNine :
                        segment === 'backNine' ? round.bettingOptions.strokePlayBets.backNine :
                        round.bettingOptions.strokePlayBets.total;
-      
-      // Award winnings
-      if (grossWinner[0] !== netWinner[0]) {
-        strokeBalances[grossWinner[0]] += unitValue;
-        strokeBalances[netWinner[0]] += unitValue;
-        strokePot += unitValue * 2;
+
+      const strokePot = betAmount * round.players.length;
+      totalPot += strokePot;
+
+      // Calculate segment net scores
+      const segmentScores = round.players.map(player => {
+        const segmentNet = player.scores
+          .filter(score => segmentHoles.includes(score.holeNumber))
+          .reduce((sum, score) => sum + score.netScore, 0);
+
+        return {
+          player,
+          netScore: segmentNet
+        };
+      });
+
+      // Sort by net score (lowest wins)
+      segmentScores.sort((a, b) => a.netScore - b.netScore);
+
+      // Check for ties at the lowest score
+      const winningScore = segmentScores[0].netScore;
+      const winners = segmentScores.filter(s => s.netScore === winningScore);
+
+      if (winners.length === 1) {
+        // Clear winner - gets pot minus their contribution
+        const winnerId = winners[0].player.id;
+        strokeBalances[winnerId] = strokePot - betAmount;
+        
+        // Others lose their bet
+        segmentScores.slice(1).forEach(playerScore => {
+          strokeBalances[playerScore.player.id] = -betAmount;
+        });
       } else {
-        strokeBalances[grossWinner[0]] += unitValue * 2;
-        strokePot += unitValue * 2;
+        // Tie - winners split the non-contributing portion, others lose
+        const nonContributingPot = strokePot - (betAmount * winners.length);
+        const winnerShare = nonContributingPot / winners.length;
+        
+        winners.forEach(winner => {
+          strokeBalances[winner.player.id] = winnerShare;
+        });
+        
+        segmentScores.filter(s => s.netScore > winningScore).forEach(playerScore => {
+          strokeBalances[playerScore.player.id] = -betAmount;
+        });
       }
 
-      result.strokePlay = { playerBalances: strokeBalances, totalPot: strokePot };
+      // Add to combined balances
+      Object.entries(strokeBalances).forEach(([playerId, amount]) => {
+        combinedBalances[playerId] += amount;
+      });
+
+      result.strokePlayResults = { playerBalances: strokeBalances, totalPot: strokePot };
     }
 
-    // Calculate Match Play if enabled
-    if (round.gameFormats.matchPlay) {
+    // Calculate Match Play if enabled and segment is active
+    if (round.gameFormats.matchPlay && round.bettingOptions.segments[segment]) {
       const matchBalances: Record<string, number> = {};
-      let matchPot = 0;
-
       round.players.forEach(player => {
         matchBalances[player.id] = 0;
       });
 
-      // Use specific match play bet amount for this segment
-      const unitValue = segment === 'frontNine' ? round.bettingOptions.matchPlayBets.frontNine :
+      // Get bet amount for this segment
+      const betAmount = segment === 'frontNine' ? round.bettingOptions.matchPlayBets.frontNine :
                        segment === 'backNine' ? round.bettingOptions.matchPlayBets.backNine :
                        round.bettingOptions.matchPlayBets.total;
 
-      // Calculate hole-by-hole match play for the segment
-      let holesWonByPlayer: Record<string, number> = {};
+      const matchPot = betAmount * round.players.length;
+      totalPot += matchPot;
+
+      // Calculate match play points - hole by hole competition
+      const matchPoints: Record<string, number> = {};
       round.players.forEach(player => {
-        holesWonByPlayer[player.id] = 0;
+        matchPoints[player.id] = 0;
       });
 
-      segmentHoles.forEach(holeInfo => {
-        // Find who won this hole (lowest net score)
-        const holeWinners: string[] = [];
-        let bestScore = Infinity;
-        
-        round.players.forEach(player => {
-          const holeScore = player.scores.find(s => s.holeNumber === holeInfo.number);
-          if (holeScore && holeScore.netScore < bestScore) {
-            bestScore = holeScore.netScore;
-            holeWinners.length = 0;
-            holeWinners.push(player.id);
-          } else if (holeScore && holeScore.netScore === bestScore) {
-            holeWinners.push(player.id);
-          }
-        });
+      // Award points for each hole in the segment
+      segmentHoles.forEach(holeNumber => {
+        const holeScores = round.players.map(player => {
+          const score = player.scores.find(s => s.holeNumber === holeNumber);
+          return {
+            player,
+            netScore: score ? score.netScore : 999
+          };
+        }).sort((a, b) => a.netScore - b.netScore);
 
-        // Award hole wins (only if not tied)
-        if (holeWinners.length === 1) {
-          holesWonByPlayer[holeWinners[0]]++;
+        // Award points: winner gets +1 point for the hole
+        if (holeScores.length > 0) {
+          const winningScore = holeScores[0].netScore;
+          const holeWinners = holeScores.filter(h => h.netScore === winningScore);
+          
+          if (holeWinners.length === 1) {
+            matchPoints[holeWinners[0].player.id] += 1;
+          }
+          // If tied on hole, no points awarded
         }
       });
 
-      // Determine segment winner and award prize
-      const maxHolesWon = Math.max(...Object.values(holesWonByPlayer));
-      const segmentWinners = Object.keys(holesWonByPlayer).filter(id => holesWonByPlayer[id] === maxHolesWon);
-      
-      if (segmentWinners.length === 1 && maxHolesWon > 0) {
-        matchBalances[segmentWinners[0]] += unitValue;
-        matchPot += unitValue;
+      // Determine overall match play winner for the segment
+      const sortedByPoints = Object.entries(matchPoints).sort(([,a], [,b]) => b - a);
+      const maxPoints = sortedByPoints[0][1];
+      const segmentWinners = sortedByPoints.filter(([, points]) => points === maxPoints);
+
+      if (segmentWinners.length === 1) {
+        // Clear match play winner
+        const winnerId = segmentWinners[0][0];
+        matchBalances[winnerId] = matchPot - betAmount;
+        
+        // Others lose their bet
+        round.players.forEach(player => {
+          if (player.id !== winnerId) {
+            matchBalances[player.id] = -betAmount;
+          }
+        });
+      } else {
+        // Tie in match play - winners split non-contributing portion
+        const nonContributingPot = matchPot - (betAmount * segmentWinners.length);
+        const winnerShare = nonContributingPot / segmentWinners.length;
+        
+        segmentWinners.forEach(([winnerId]) => {
+          matchBalances[winnerId] = winnerShare;
+        });
+        
+        // Non-winners lose their bet
+        round.players.forEach(player => {
+          const isWinner = segmentWinners.some(([winnerId]) => winnerId === player.id);
+          if (!isWinner) {
+            matchBalances[player.id] = -betAmount;
+          }
+        });
       }
 
-      result.matchPlay = { playerBalances: matchBalances, totalPot: matchPot };
+      // Add to combined balances
+      Object.entries(matchBalances).forEach(([playerId, amount]) => {
+        combinedBalances[playerId] += amount;
+      });
+
+      result.matchPlayResults = { playerBalances: matchBalances, totalPot: matchPot };
     }
+
+    result.playerBalances = combinedBalances;
+    result.totalPot = totalPot;
 
     return result;
   }
@@ -188,44 +233,50 @@ export class BettingCalculator {
   static calculateTotalBetting(
     round: { players: RoundPlayer[]; bettingOptions: BettingOptions; gameFormat: 'stroke' | 'match' },
     holes: HoleInfo[]
-  ): Map<string, number> {
-    const balances = new Map<string, number>();
+  ): Record<string, number> {
+    const playerBalances: Record<string, number> = {};
     
-    // Initialize balances
     round.players.forEach(player => {
-      balances.set(player.name, 0);
+      playerBalances[player.id] = 0;
     });
 
-    // Calculate for each hole
-    holes.forEach(holeInfo => {
-      const bettingResults = this.calculateHoleBetting(
-        round.players,
-        holeInfo,
-        round.bettingOptions
-      );
+    // Calculate betting results for all three segments
+    const frontNineResults = this.calculateSegmentBetting(
+      { ...round, gameFormats: { strokePlay: round.gameFormat === 'stroke', matchPlay: round.gameFormat === 'match' } },
+      'frontNine'
+    );
+    
+    const backNineResults = this.calculateSegmentBetting(
+      { ...round, gameFormats: { strokePlay: round.gameFormat === 'stroke', matchPlay: round.gameFormat === 'match' } },
+      'backNine'
+    );
+    
+    const totalResults = this.calculateSegmentBetting(
+      { ...round, gameFormats: { strokePlay: round.gameFormat === 'stroke', matchPlay: round.gameFormat === 'match' } },
+      'total'
+    );
 
-      bettingResults.forEach(result => {
-        if (result.winner && result.amount > 0) {
-          const currentBalance = balances.get(result.winner) || 0;
-          balances.set(result.winner, currentBalance + result.amount);
-          
-          // Subtract from other players
-          const costPerPlayer = result.amount / (round.players.length - 1);
-          round.players.forEach(player => {
-            if (player.name !== result.winner) {
-              const currentBalance = balances.get(player.name) || 0;
-              balances.set(player.name, currentBalance - costPerPlayer);
-            }
-          });
-        }
+    // Combine all results
+    [frontNineResults, backNineResults, totalResults].forEach(segmentResult => {
+      Object.entries(segmentResult.playerBalances).forEach(([playerId, amount]) => {
+        playerBalances[playerId] += amount;
       });
     });
 
-    return balances;
+    return playerBalances;
   }
 
   static getStrokesReceived(playerHandicap: number, holeStrokeIndex: number): number {
-    return Math.floor(playerHandicap / 18) + 
-      (holeStrokeIndex <= (playerHandicap % 18) ? 1 : 0);
+    if (playerHandicap <= 0) return 0;
+    
+    const strokesPerHole = Math.floor(playerHandicap / 18);
+    const extraStrokes = playerHandicap % 18;
+    
+    let strokes = strokesPerHole;
+    if (holeStrokeIndex <= extraStrokes) {
+      strokes += 1;
+    }
+    
+    return strokes;
   }
 }
