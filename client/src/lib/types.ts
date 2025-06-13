@@ -100,7 +100,7 @@ export interface BettingResult {
 }
 
 // Club Campestre de Puebla - Datos oficiales del campo
-// La Vista Country Club data from CSV
+// La Vista Country Club data from CSV - Exact authentic data
 export const LA_VISTA_HOLES: HoleInfo[] = [
   { number: 1, par: 4, strokeIndex: { negras: 5, azules: 5, blancas: 5, blancas_f: 5, doradas: 5, plateadas: 5, rojas: 5 }, distances: { negras: 435, azules: 435, blancas: 392, blancas_f: 392, doradas: 322, plateadas: 322, rojas: 311 } },
   { number: 2, par: 3, strokeIndex: { negras: 17, azules: 17, blancas: 17, blancas_f: 17, doradas: 17, plateadas: 17, rojas: 17 }, distances: { negras: 187, azules: 187, blancas: 165, blancas_f: 165, doradas: 115, plateadas: 115, rojas: 105 } },
