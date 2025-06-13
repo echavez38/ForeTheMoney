@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { RoundPlayer, HoleInfo, TeeSelection } from '@/lib/types';
-import { ChevronLeft, ChevronRight, RotateCw, Target, TrendingUp, CreditCard } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCw, Target, TrendingUp, CreditCard, X } from 'lucide-react';
 
 interface ModernScorecardProps {
   players: RoundPlayer[];
@@ -13,6 +13,7 @@ interface ModernScorecardProps {
   canGoNext: boolean;
   canGoPrev: boolean;
   onViewScorecard?: () => void;
+  onAbandonRound?: () => void;
   gameFormats: {
     strokePlay: boolean;
     matchPlay: boolean;
@@ -28,6 +29,7 @@ export function ModernScorecard({
   canGoNext,
   canGoPrev,
   onViewScorecard,
+  onAbandonRound,
   gameFormats
 }: ModernScorecardProps) {
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
@@ -158,6 +160,17 @@ export function ModernScorecard({
           </div>
           
           <div className="flex items-center space-x-3">
+            {onAbandonRound && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onAbandonRound}
+                className="p-2 text-red-400 hover:bg-red-900/20 hover:text-red-300"
+                title="Abandonar Ronda"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            )}
             {onViewScorecard && (
               <Button
                 variant="ghost"

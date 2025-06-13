@@ -147,6 +147,20 @@ export default function Scorecard() {
     setLocation('/golf-scorecard');
   };
 
+  const handleAbandonRound = () => {
+    if (!round) return;
+
+    // Clear the current round from storage
+    StorageManager.setCurrentRound(null);
+    
+    toast({
+      title: "Ronda abandonada",
+      description: "Has salido de la ronda actual",
+    });
+    
+    setLocation('/dashboard');
+  };
+
   const getCurrentHoleBetting = () => {
     if (!round || !currentHoleInfo) return [];
 
@@ -169,6 +183,7 @@ export default function Scorecard() {
       canGoNext={true}
       canGoPrev={round.currentHole > 1}
       onViewScorecard={handleViewScorecard}
+      onAbandonRound={handleAbandonRound}
       gameFormats={round.gameFormats}
     />
   );
