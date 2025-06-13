@@ -11,7 +11,10 @@ export interface Round {
   holes: number;
   players: RoundPlayer[];
   currentHole: number;
-  gameFormat: 'stroke' | 'match';
+  gameFormats: {
+    strokePlay: boolean;
+    matchPlay: boolean;
+  };
   bettingOptions: BettingOptions;
   completed: boolean;
   createdAt: Date;

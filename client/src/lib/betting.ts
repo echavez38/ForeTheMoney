@@ -60,10 +60,10 @@ export class BettingCalculator {
   }
 
   static calculateSegmentBetting(
-    round: { players: RoundPlayer[]; bettingOptions: BettingOptions; gameFormat: 'stroke' | 'match' },
+    round: { players: RoundPlayer[]; bettingOptions: BettingOptions; gameFormats: { strokePlay: boolean; matchPlay: boolean } },
     holes: HoleInfo[],
     segment: 'frontNine' | 'backNine' | 'total'
-  ): { playerBalances: Record<string, number>; totalPot: number } {
+  ): { strokePlay?: { playerBalances: Record<string, number>; totalPot: number }; matchPlay?: { playerBalances: Record<string, number>; totalPot: number } } {
     const playerBalances: Record<string, number> = {};
     let totalPot = 0;
 

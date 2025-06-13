@@ -16,7 +16,10 @@ export default function CreateRound() {
   const [holes, setHoles] = useState<9 | 18>(18);
   const [course, setCourse] = useState('Club Campestre de Puebla');
   const [players, setPlayers] = useState<Omit<RoundPlayer, 'scores' | 'grossTotal' | 'netTotal' | 'moneyBalance'>[]>([]);
-  const [gameFormat, setGameFormat] = useState<'stroke' | 'match'>('stroke');
+  const [gameFormats, setGameFormats] = useState({
+    strokePlay: true,
+    matchPlay: false,
+  });
   const [bettingOptions, setBettingOptions] = useState<BettingOptions>({
     skins: false,
     oyeses: true,
@@ -132,7 +135,7 @@ export default function CreateRound() {
         moneyBalance: 0,
       })),
       currentHole: 1,
-      gameFormat,
+      gameFormats,
       bettingOptions,
       completed: false,
       createdAt: new Date(),
@@ -317,35 +320,33 @@ export default function CreateRound() {
         <Card className="bg-dark-surface border-gray-700">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4 text-white">Formato de Juego</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                variant={gameFormat === 'stroke' ? "default" : "outline"}
-                onClick={() => setGameFormat('stroke')}
-                className={`p-3 h-auto text-left ${
-                  gameFormat === 'stroke' 
-                    ? 'bg-golf-blue hover:bg-golf-blue-dark border-golf-blue' 
-                    : 'bg-transparent border-gray-600 hover:border-golf-blue hover:bg-golf-blue/20'
-                }`}
-              >
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-white">Stroke Play</p>
+                  <label className="text-white font-medium">Stroke Play</label>
                   <p className="text-xs text-gray-400">Conteo total de golpes</p>
                 </div>
-              </Button>
-              <Button
-                variant={gameFormat === 'match' ? "default" : "outline"}
-                onClick={() => setGameFormat('match')}
-                className={`p-3 h-auto text-left ${
-                  gameFormat === 'match' 
-                    ? 'bg-golf-blue hover:bg-golf-blue-dark border-golf-blue' 
-                    : 'bg-transparent border-gray-600 hover:border-golf-blue hover:bg-golf-blue/20'
-                }`}
-              >
+                <Checkbox
+                  checked={gameFormats.strokePlay}
+                  onCheckedChange={(checked) => 
+                    setGameFormats({...gameFormats, strokePlay: checked as boolean})
+                  }
+                  className="border-gray-600"
+                />
+              </div>
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-white">Match Play</p>
+                  <label className="text-white font-medium">Match Play</label>
                   <p className="text-xs text-gray-400">Hoyo por hoyo</p>
                 </div>
-              </Button>
+                <Checkbox
+                  checked={gameFormats.matchPlay}
+                  onCheckedChange={(checked) => 
+                    setGameFormats({...gameFormats, matchPlay: checked as boolean})
+                  }
+                  className="border-gray-600"
+                />
+              </div>
             </div>
           </CardContent>
         </Card>
