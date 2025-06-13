@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { StorageManager } from '@/lib/storage';
-import { User, Round, RoundPlayer, BettingOptions, TeeSelection, TEE_OPTIONS } from '@/lib/types';
+import { User, Round, RoundPlayer, BettingOptions, TeeSelection, TEE_OPTIONS, GOLF_COURSES, GolfCourse } from '@/lib/types';
 import { ArrowLeft, Plus, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -14,7 +14,7 @@ export default function CreateRound() {
   const [, setLocation] = useLocation();
   const [user, setUser] = useState<User | null>(null);
   const [holes, setHoles] = useState<9 | 18>(18);
-  const [course, setCourse] = useState('Club Campestre de Puebla');
+  const [selectedCourse, setSelectedCourse] = useState<GolfCourse>(GOLF_COURSES[0]);
   const [players, setPlayers] = useState<Omit<RoundPlayer, 'scores' | 'grossTotal' | 'netTotal' | 'moneyBalance'>[]>([]);
   const [gameFormats, setGameFormats] = useState({
     strokePlay: true,
@@ -86,7 +86,7 @@ export default function CreateRound() {
       id: Date.now().toString(),
       name: newPlayerName.trim(),
       handicap: parseInt(newPlayerHandicap) || 18,
-      selectedTee: TEE_OPTIONS[2], // Default to Blancas (H)
+      selectedTee: selectedCourse.teeOptions[0], // Default to first tee option for selected course
     };
 
     setPlayers([...players, newPlayer]);
@@ -114,8 +114,20 @@ export default function CreateRound() {
     ));
   };
 
+  const handleCourseChange = (courseId: string) => {
+    const course = GOLF_COURSES.find(c => c.id === courseId);
+    if (course) {
+      setSelectedCourse(course);
+      // Reset all player tees to first available option for new course
+      setPlayers(prev => prev.map(player => ({
+        ...player,
+        selectedTee: course.teeOptions[0]
+      })));
+    }
+  };
+
   const startRound = () => {
-    if (!course.trim()) {
+    if (!selectedCourse) {
       toast({
         title: "Error",
         description: "Selecciona un campo de golf",
