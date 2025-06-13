@@ -11,13 +11,21 @@ Mobile-optimized web application for golf scoring and betting calculations speci
 - **State Management**: React Query for server state, local storage for offline functionality
 
 ## Golf Course Data
-**Club Campestre de Puebla** - Only available golf course in the application
+**Multiple Golf Course Support** - Two authentic golf courses available:
+
+### Club Campestre de Puebla
 - 18 holes with official par, stroke index, and distance data
 - Six tee options with proper gender segregation:
   - **Hombres** (mayor a menor dificultad): Negras, Azules, Blancas, Doradas, Plateadas
   - **Mujeres**: Blancas, Rojas
 - Distances in meters for each tee position
 - Authentic data from club's official scorecard
+
+### La Vista Country Club
+- 18 holes with official par, stroke index, and distance data from CSV
+- Four tee options: Azules, Blancas, Doradas, Rojas
+- All distances in meters from authentic course records
+- Proper handicap indexing for each hole
 
 ## Recent Changes
 **June 13, 2025**
@@ -114,6 +122,13 @@ Mobile-optimized web application for golf scoring and betting calculations speci
   - Winner receives money from all players (unitPerHole × player count)
   - Integration with overall betting calculations and debriefing results
   - Persistent storage of Oyeses winners per hole in round data
+- **LA VISTA COUNTRY CLUB ADDED**: Second golf course now available:
+  - Complete 18-hole course data imported from authentic CSV file
+  - Four tee options: Azules, Blancas, Doradas, Rojas
+  - Official par, handicap, and distance data for all holes
+  - Course selection interface in round creation with dynamic tee options
+  - Automatic course-specific data loading in scorecards and gameplay
+  - Full integration with all betting systems and golf scorecard views
 
 ## User Preferences
 - Spanish language interface
