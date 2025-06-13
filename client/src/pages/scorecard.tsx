@@ -38,10 +38,11 @@ export default function Scorecard() {
     if (playerIndex === -1) return;
 
     const player = updatedRound.players[playerIndex];
+    const holeStrokeIndex = currentHoleInfo.strokeIndex[round.selectedTees.color];
     const netScore = BettingCalculator.calculateNetScore(
       grossScore,
       player.handicap,
-      currentHoleInfo.strokeIndex
+      holeStrokeIndex
     );
 
     // Update or add score for current hole
@@ -51,7 +52,7 @@ export default function Scorecard() {
       grossScore,
       netScore,
       par: currentHoleInfo.par,
-      strokeIndex: currentHoleInfo.strokeIndex,
+      strokeIndex: holeStrokeIndex,
     };
 
     if (existingScoreIndex >= 0) {

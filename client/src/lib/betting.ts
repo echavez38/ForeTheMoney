@@ -1,4 +1,4 @@
-import { RoundPlayer, HoleInfo, BettingResult, BettingOptions } from './types';
+import { RoundPlayer, HoleInfo, BettingResult, BettingOptions, TeeSelection } from './types';
 
 export class BettingCalculator {
   static calculateNetScore(
