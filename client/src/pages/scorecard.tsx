@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { ModernScorecard } from '@/components/modern-scorecard';
 import { StorageManager } from '@/lib/storage';
 import { BettingCalculator } from '@/lib/betting';
-import { Round, DEFAULT_HOLES, HoleInfo } from '@/lib/types';
+import { Round, DEFAULT_HOLES, HoleInfo, GOLF_COURSES } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 export default function Scorecard() {
@@ -24,7 +24,9 @@ export default function Scorecard() {
   }, [setLocation]);
 
   const updateCurrentHoleInfo = (roundData: Round) => {
-    const holes = DEFAULT_HOLES.slice(0, roundData.holes);
+    // Find the correct course data based on the round's course name
+    const course = GOLF_COURSES.find(c => c.name === roundData.course) || GOLF_COURSES[0];
+    const holes = course.holes.slice(0, roundData.holes);
     const holeInfo = holes[roundData.currentHole - 1];
     setCurrentHoleInfo(holeInfo);
   };

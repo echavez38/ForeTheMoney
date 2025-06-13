@@ -147,7 +147,7 @@ export default function CreateRound() {
 
     const round: Round = {
       id: Date.now().toString(),
-      course: course.trim(),
+      course: selectedCourse.name,
       holes,
       players: players.map(p => ({
         ...p,
@@ -166,7 +166,7 @@ export default function CreateRound() {
     StorageManager.setCurrentRound(round);
     toast({
       title: "¡Ronda creada!",
-      description: `Comenzando en ${course}`,
+      description: `Comenzando en ${selectedCourse.name}`,
     });
     setLocation('/scorecard');
   };
@@ -224,14 +224,21 @@ export default function CreateRound() {
         <Card className="bg-dark-surface border-gray-700">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4 text-white">Campo de Golf</h3>
-            <Select value={course} onValueChange={setCourse}>
+            <Select value={selectedCourse.id} onValueChange={handleCourseChange}>
               <SelectTrigger className="bg-dark-card border-gray-600 text-white">
                 <SelectValue placeholder="Seleccionar campo..." />
               </SelectTrigger>
               <SelectContent className="bg-dark-card border-gray-600">
-                <SelectItem value="Club Campestre de Puebla">Club Campestre de Puebla</SelectItem>
+                {GOLF_COURSES.map((course) => (
+                  <SelectItem key={course.id} value={course.id}>
+                    {course.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
+            <p className="text-gray-400 text-sm mt-2">
+              {selectedCourse.holes.length} hoyos disponibles
+            </p>
           </CardContent>
         </Card>
 
@@ -275,7 +282,7 @@ export default function CreateRound() {
                   <div>
                     <p className="text-sm text-gray-400 mb-2">Marca de salida: <span className="text-white font-medium">{player.selectedTee.name}</span></p>
                     <div className="grid grid-cols-3 gap-2">
-                      {TEE_OPTIONS.map((tee) => (
+                      {selectedCourse.teeOptions.map((tee) => (
                         <Button
                           key={tee.color}
                           variant={player.selectedTee.color === tee.color ? "default" : "outline"}

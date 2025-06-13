@@ -1,14 +1,16 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Round, DEFAULT_HOLES } from '@/lib/types';
+import { Round, DEFAULT_HOLES, GOLF_COURSES } from '@/lib/types';
 
 interface GolfScorecardProps {
   round: Round;
 }
 
 export function GolfScorecard({ round }: GolfScorecardProps) {
-  const frontNine = DEFAULT_HOLES.slice(0, 9);
-  const backNine = DEFAULT_HOLES.slice(9, 18);
+  // Find the correct course data based on the round's course name
+  const course = GOLF_COURSES.find(c => c.name === round.course) || GOLF_COURSES[0];
+  const frontNine = course.holes.slice(0, 9);
+  const backNine = course.holes.slice(9, 18);
 
   const getTeeColor = (color: string) => {
     switch (color) {
