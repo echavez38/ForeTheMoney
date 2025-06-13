@@ -8,6 +8,7 @@ import Dashboard from "@/pages/dashboard";
 import CreateRound from "@/pages/create-round";
 import Scorecard from "@/pages/scorecard";
 import Results from "@/pages/results";
+import RoundDebrief from "@/pages/round-debrief";
 import Analytics from "@/pages/analytics";
 import GolfScorecardPage from "@/pages/golf-scorecard";
 import NotFound from "@/pages/not-found";
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/golf-scorecard" component={GolfScorecardPage} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/results" component={Results} />
+      <Route path="/round-debrief" component={RoundDebrief} />
       <Route component={NotFound} />
     </Switch>
   );

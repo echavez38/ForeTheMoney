@@ -61,9 +61,19 @@ export class BettingCalculator {
 
   static calculateSegmentBetting(
     round: { players: RoundPlayer[]; bettingOptions: BettingOptions; gameFormats: { strokePlay: boolean; matchPlay: boolean } },
-    holes: HoleInfo[],
     segment: 'frontNine' | 'backNine' | 'total'
-  ): { strokePlay?: { playerBalances: Record<string, number>; totalPot: number }; matchPlay?: { playerBalances: Record<string, number>; totalPot: number } } {
+  ): { 
+    strokePlay?: { 
+      frontNine?: { playerBalances: Record<string, number>; totalPot: number };
+      backNine?: { playerBalances: Record<string, number>; totalPot: number };
+      total?: { playerBalances: Record<string, number>; totalPot: number };
+    }; 
+    matchPlay?: { 
+      frontNine?: { playerBalances: Record<string, number>; totalPot: number };
+      backNine?: { playerBalances: Record<string, number>; totalPot: number };
+      total?: { playerBalances: Record<string, number>; totalPot: number };
+    } 
+  } {
     const result: { strokePlay?: { playerBalances: Record<string, number>; totalPot: number }; matchPlay?: { playerBalances: Record<string, number>; totalPot: number } } = {};
 
     const segmentHoles = segment === 'frontNine' ? holes.slice(0, 9) :
