@@ -62,6 +62,12 @@ Mobile-optimized web application for golf scoring and betting calculations speci
   - Hoyo 9: Par 5 (was Par 3), Hoyo 12: Par 5 (was Par 3)
   - Hoyo 13: Par 3 (was Par 5), Hoyo 15: Par 5 (was Par 3)
   - Hoyo 17: Par 3 (was Par 5)
+- **REAL-TIME SCORING INDICATORS**: Enhanced scorecard with live status tracking:
+  - Stroke Play indicators show position relative to par (E, +1, -2, etc.)
+  - Match Play indicators show standing vs leader (AS, 1 UP, 2 DN, etc.)
+  - Individual player status displayed under each name
+  - Tournament status panel with live rankings for both formats
+  - Color-coded indicators (green=good, red=behind, blue=even)
 
 ## User Preferences
 - Spanish language interface

@@ -307,6 +307,99 @@ export function ModernScorecard({
         </Card>
       </div>
 
+      {/* Tournament Status Panel */}
+      {(gameFormats.strokePlay || gameFormats.matchPlay) && (
+        <div className="p-4 mb-20">
+          <Card className="bg-dark-surface border-gray-700">
+            <CardContent className="p-4">
+              <h3 className="text-lg font-semibold text-white mb-4 text-center">Estado del Torneo</h3>
+              
+              {gameFormats.strokePlay && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-blue-400 mb-2">Stroke Play - Clasificación</h4>
+                  <div className="space-y-2">
+                    {players
+                      .map(player => ({
+                        ...player,
+                        status: getStrokePlayStatus(player),
+                        completedHoles: player.scores.filter(s => s.holeNumber <= currentHole).length
+                      }))
+                      .sort((a, b) => {
+                        const aTotal = a.scores.filter(s => s.holeNumber <= currentHole)
+                          .reduce((sum, score) => sum + score.grossScore, 0);
+                        const bTotal = b.scores.filter(s => s.holeNumber <= currentHole)
+                          .reduce((sum, score) => sum + score.grossScore, 0);
+                        return aTotal - bTotal;
+                      })
+                      .map((player, index) => (
+                        <div key={player.id} className="flex items-center justify-between p-2 bg-dark-card rounded">
+                          <div className="flex items-center space-x-3">
+                            <span className="text-white font-bold text-sm w-6">#{index + 1}</span>
+                            <div className="w-6 h-6 bg-golf-blue rounded-full flex items-center justify-center">
+                              <span className="text-xs font-bold text-white">
+                                {player.name.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                            <span className="text-white">{player.name}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-gray-400 text-sm">{player.completedHoles}/18</span>
+                            <span className={`font-semibold ${getStatusColor(player.status)}`}>
+                              {player.status || '—'}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </div>
+                </div>
+              )}
+
+              {gameFormats.matchPlay && (
+                <div>
+                  <h4 className="text-sm font-medium text-green-400 mb-2">Match Play - Estado</h4>
+                  <div className="space-y-2">
+                    {players
+                      .map(player => ({
+                        ...player,
+                        status: getMatchPlayStatus(player),
+                        completedHoles: player.scores.filter(s => s.holeNumber <= currentHole).length
+                      }))
+                      .sort((a, b) => {
+                        const aNet = a.scores.filter(s => s.holeNumber <= currentHole)
+                          .reduce((sum, score) => sum + score.netScore, 0);
+                        const bNet = b.scores.filter(s => s.holeNumber <= currentHole)
+                          .reduce((sum, score) => sum + score.netScore, 0);
+                        return aNet - bNet;
+                      })
+                      .map((player, index) => (
+                        <div key={player.id} className="flex items-center justify-between p-2 bg-dark-card rounded">
+                          <div className="flex items-center space-x-3">
+                            <span className="text-white font-bold text-sm w-6">#{index + 1}</span>
+                            <div className="w-6 h-6 bg-golf-green rounded-full flex items-center justify-center">
+                              <span className="text-xs font-bold text-white">
+                                {player.name.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                            <span className="text-white">{player.name}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-gray-400 text-sm">{player.completedHoles}/18</span>
+                            <span className={`font-semibold ${getStatusColor(player.status)}`}>
+                              {player.status || '—'}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Navigation */}
       <div className="fixed bottom-6 left-4 right-4">
         <div className="flex space-x-3">
