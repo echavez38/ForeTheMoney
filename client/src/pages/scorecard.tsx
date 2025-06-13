@@ -150,6 +150,7 @@ export default function Scorecard() {
       players={round.players}
       currentHole={round.currentHole}
       holeInfo={currentHoleInfo}
+      selectedTees={round.selectedTees}
       onScoreChange={handleScoreChange}
       onNavigate={handleNavigation}
       canGoNext={true}

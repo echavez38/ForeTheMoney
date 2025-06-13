@@ -66,8 +66,16 @@ export function ModernScorecard({
             </div>
           </div>
           
-          <div className="bg-golf-blue rounded-full w-12 h-12 flex items-center justify-center">
-            <span className="text-white font-bold text-lg">{holeInfo.par}</span>
+          <div className="flex items-center space-x-2">
+            <div className={`w-4 h-4 rounded-full ${
+              selectedTees.color === 'doradas' ? 'bg-yellow-400' :
+              selectedTees.color === 'azules' ? 'bg-blue-400' :
+              selectedTees.color === 'blancas' ? 'bg-gray-200' :
+              'bg-red-400'
+            }`} />
+            <div className="bg-golf-blue rounded-full w-12 h-12 flex items-center justify-center">
+              <span className="text-white font-bold text-lg">{holeInfo.par}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -158,15 +166,26 @@ export function ModernScorecard({
       <div className="mx-4 mb-4">
         <Card className="bg-dark-card border-gray-700">
           <CardContent className="p-4">
-            <h3 className="font-semibold mb-3 text-white flex items-center">
-              <Target className="h-4 w-4 text-golf-blue mr-2" />
-              Estadísticas del Hoyo
-            </h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-white flex items-center">
+                <Target className="h-4 w-4 text-golf-blue mr-2" />
+                Información del Hoyo
+              </h3>
+              <div className="flex items-center space-x-2 text-sm text-secondary">
+                <div className={`w-3 h-3 rounded-full ${
+                  selectedTees.color === 'doradas' ? 'bg-yellow-400' :
+                  selectedTees.color === 'azules' ? 'bg-blue-400' :
+                  selectedTees.color === 'blancas' ? 'bg-gray-200' :
+                  'bg-red-400'
+                }`} />
+                <span>{selectedTees.name}</span>
+              </div>
+            </div>
             
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center">
                 <p className="text-2xl font-bold text-golf-blue">{holeInfo.strokeIndex}</p>
-                <p className="text-xs text-secondary">Índice Handicap</p>
+                <p className="text-xs text-secondary">Índice HCP</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-white">{holeInfo.distances[selectedTees.color]}m</p>

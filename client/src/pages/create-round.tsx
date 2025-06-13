@@ -22,6 +22,7 @@ export default function CreateRound() {
     foursomes: false,
     unitPerHole: 1.0,
   });
+  const [selectedTees, setSelectedTees] = useState<TeeSelection>(TEE_OPTIONS[2]); // Default to Blancas
   const [newPlayerName, setNewPlayerName] = useState('');
   const [newPlayerHandicap, setNewPlayerHandicap] = useState('18');
   const { toast } = useToast();
@@ -116,6 +117,7 @@ export default function CreateRound() {
       })),
       currentHole: 1,
       bettingOptions,
+      selectedTees,
       completed: false,
       createdAt: new Date(),
     };
@@ -186,13 +188,52 @@ export default function CreateRound() {
                 <SelectValue placeholder="Seleccionar campo..." />
               </SelectTrigger>
               <SelectContent className="bg-dark-card border-gray-600">
+                <SelectItem value="Club Campestre de Puebla">Club Campestre de Puebla</SelectItem>
                 <SelectItem value="Club de Golf Las Brisas">Club de Golf Las Brisas</SelectItem>
                 <SelectItem value="Real Club de Golf">Real Club de Golf</SelectItem>
                 <SelectItem value="Golf La Moraleja">Golf La Moraleja</SelectItem>
                 <SelectItem value="Club de Campo Villa de Madrid">Club de Campo Villa de Madrid</SelectItem>
-                <SelectItem value="El Saler Golf">El Saler Golf</SelectItem>
               </SelectContent>
             </Select>
+          </CardContent>
+        </Card>
+
+        {/* Tee Selection */}
+        <Card className="bg-dark-surface border-gray-700">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4 text-white">Marcas de Salida (Tees)</h3>
+            <div className="grid grid-cols-1 gap-3">
+              {TEE_OPTIONS.map((tee) => (
+                <Button
+                  key={tee.color}
+                  variant={selectedTees.color === tee.color ? "default" : "outline"}
+                  onClick={() => setSelectedTees(tee)}
+                  className={`p-4 h-auto flex items-center justify-between text-left ${
+                    selectedTees.color === tee.color 
+                      ? 'bg-golf-blue hover:bg-golf-blue-dark border-golf-blue' 
+                      : 'bg-transparent border-gray-600 hover:border-golf-blue hover:bg-golf-blue/20'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-4 h-4 rounded-full ${
+                      tee.color === 'doradas' ? 'bg-yellow-400' :
+                      tee.color === 'azules' ? 'bg-blue-400' :
+                      tee.color === 'blancas' ? 'bg-gray-200' :
+                      'bg-red-400'
+                    }`} />
+                    <div>
+                      <p className="font-semibold text-white">{tee.name}</p>
+                      <p className="text-sm text-secondary">{tee.description}</p>
+                    </div>
+                  </div>
+                  {selectedTees.color === tee.color && (
+                    <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-golf-blue rounded-full" />
+                    </div>
+                  )}
+                </Button>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
