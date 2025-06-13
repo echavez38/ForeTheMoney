@@ -38,7 +38,7 @@ export default function Scorecard() {
     if (playerIndex === -1) return;
 
     const player = updatedRound.players[playerIndex];
-    const holeStrokeIndex = currentHoleInfo.strokeIndex[round.selectedTees.color];
+    const holeStrokeIndex = currentHoleInfo.strokeIndex[player.selectedTee.color];
     const netScore = BettingCalculator.calculateNetScore(
       grossScore,
       player.handicap,
@@ -151,7 +151,6 @@ export default function Scorecard() {
       players={round.players}
       currentHole={round.currentHole}
       holeInfo={currentHoleInfo}
-      selectedTees={round.selectedTees}
       onScoreChange={handleScoreChange}
       onNavigate={handleNavigation}
       canGoNext={true}

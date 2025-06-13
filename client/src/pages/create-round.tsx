@@ -252,30 +252,63 @@ export default function CreateRound() {
               <h3 className="text-lg font-semibold text-white">Jugadores ({players.length}/6)</h3>
             </div>
             
-            <div className="space-y-3 mb-4">
+            <div className="space-y-4 mb-4">
               {players.map((player) => (
-                <div key={player.id} className="flex items-center justify-between p-3 bg-dark-card rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-golf-green rounded-full flex items-center justify-center">
-                      <span className="text-sm font-semibold text-white">
-                        {player.name.charAt(0).toUpperCase()}
-                      </span>
+                <div key={player.id} className="p-4 bg-dark-card rounded-lg space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-golf-green rounded-full flex items-center justify-center">
+                        <span className="text-sm font-semibold text-white">
+                          {player.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-white">{player.name}</p>
+                        <p className="text-sm text-gray-400">Handicap: {player.handicap}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-white">{player.name}</p>
-                      <p className="text-sm text-gray-400">Handicap: {player.handicap}</p>
+                    {user && player.id !== user.id && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removePlayer(player.id)}
+                        className="text-red-400 hover:text-red-300 hover:bg-red-500/20"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {/* Tee Selection for each player */}
+                  <div>
+                    <p className="text-sm text-gray-400 mb-2">Marca de salida: <span className="text-white font-medium">{player.selectedTee.name}</span></p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {TEE_OPTIONS.map((tee) => (
+                        <Button
+                          key={tee.color}
+                          variant={player.selectedTee.color === tee.color ? "default" : "outline"}
+                          onClick={() => updatePlayerTee(player.id, tee)}
+                          className={`p-2 h-auto text-left text-xs ${
+                            player.selectedTee.color === tee.color 
+                              ? 'bg-golf-blue hover:bg-golf-blue-dark border-golf-blue' 
+                              : 'bg-transparent border-gray-600 hover:border-golf-blue hover:bg-golf-blue/20'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <div className={`w-3 h-3 rounded-full ${
+                              tee.color === 'negras' ? 'bg-black border border-gray-400' :
+                              tee.color === 'azules' ? 'bg-blue-500' :
+                              tee.color === 'blancas' ? 'bg-white border border-gray-400' :
+                              tee.color === 'doradas' ? 'bg-yellow-400' :
+                              tee.color === 'plateadas' ? 'bg-gray-400' :
+                              'bg-red-500'
+                            }`} />
+                            <span className="text-white font-medium">{tee.name.replace('Tees ', '')}</span>
+                          </div>
+                        </Button>
+                      ))}
                     </div>
                   </div>
-                  {user && player.id !== user.id && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removePlayer(player.id)}
-                      className="text-red-400 hover:text-red-300 hover:bg-red-500/20"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
                 </div>
               ))}
             </div>

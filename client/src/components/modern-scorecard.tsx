@@ -8,7 +8,6 @@ interface ModernScorecardProps {
   players: RoundPlayer[];
   currentHole: number;
   holeInfo: HoleInfo;
-  selectedTees: TeeSelection;
   onScoreChange: (playerId: string, score: number) => void;
   onNavigate: (direction: 'prev' | 'next') => void;
   canGoNext: boolean;
@@ -18,8 +17,7 @@ interface ModernScorecardProps {
 export function ModernScorecard({ 
   players, 
   currentHole, 
-  holeInfo, 
-  selectedTees,
+  holeInfo,
   onScoreChange,
   onNavigate,
   canGoNext,
@@ -62,22 +60,12 @@ export function ModernScorecard({
             </Button>
             <div>
               <h1 className="text-lg font-bold text-white">Hoyo {currentHole}</h1>
-              <p className="text-sm text-secondary">Par {holeInfo.par} • {holeInfo.distances[selectedTees.color]}m</p>
+              <p className="text-sm text-secondary">Par {holeInfo.par}</p>
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
-            <div className={`w-4 h-4 rounded-full ${
-              selectedTees.color === 'negras' ? 'bg-black border border-gray-400' :
-              selectedTees.color === 'azules' ? 'bg-blue-500' :
-              selectedTees.color === 'blancas' ? 'bg-white border border-gray-400' :
-              selectedTees.color === 'doradas' ? 'bg-yellow-400' :
-              selectedTees.color === 'plateadas' ? 'bg-gray-400' :
-              'bg-red-500'
-            }`} />
-            <div className="bg-golf-blue rounded-full w-12 h-12 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">{holeInfo.par}</span>
-            </div>
+          <div className="bg-golf-blue rounded-full w-12 h-12 flex items-center justify-center">
+            <span className="text-white font-bold text-lg">{holeInfo.par}</span>
           </div>
         </div>
       </div>
