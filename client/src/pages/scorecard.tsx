@@ -159,6 +159,7 @@ export default function Scorecard() {
       canGoNext={true}
       canGoPrev={round.currentHole > 1}
       onViewScorecard={handleViewScorecard}
+      gameFormats={round.gameFormats}
     />
   );
 }

@@ -13,6 +13,10 @@ interface ModernScorecardProps {
   canGoNext: boolean;
   canGoPrev: boolean;
   onViewScorecard?: () => void;
+  gameFormats: {
+    strokePlay: boolean;
+    matchPlay: boolean;
+  };
 }
 
 export function ModernScorecard({ 
@@ -23,7 +27,8 @@ export function ModernScorecard({
   onNavigate,
   canGoNext,
   canGoPrev,
-  onViewScorecard
+  onViewScorecard,
+  gameFormats
 }: ModernScorecardProps) {
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
 
@@ -45,6 +50,68 @@ export function ModernScorecard({
     return `+${diff}`;
   };
 
+  // Calculate stroke play position relative to par
+  const getStrokePlayStatus = (player: RoundPlayer) => {
+    const completedHoles = player.scores.filter(s => s.holeNumber <= currentHole);
+    if (completedHoles.length === 0) return null;
+    
+    const totalStrokes = completedHoles.reduce((sum, score) => sum + score.grossScore, 0);
+    const totalPar = completedHoles.reduce((sum, score) => sum + score.par, 0);
+    const diff = totalStrokes - totalPar;
+    
+    if (diff === 0) return 'E';
+    if (diff > 0) return `+${diff}`;
+    return `${diff}`;
+  };
+
+  // Calculate match play status against the leader
+  const getMatchPlayStatus = (player: RoundPlayer) => {
+    const leader = players.reduce((best, current) => {
+      const bestNet = best.scores.filter(s => s.holeNumber <= currentHole)
+        .reduce((sum, score) => sum + score.netScore, 0);
+      const currentNet = current.scores.filter(s => s.holeNumber <= currentHole)
+        .reduce((sum, score) => sum + score.netScore, 0);
+      return currentNet < bestNet ? current : best;
+    });
+    
+    if (player.id === leader.id) {
+      // Check if tied with others
+      const leaderNet = leader.scores.filter(s => s.holeNumber <= currentHole)
+        .reduce((sum, score) => sum + score.netScore, 0);
+      const ties = players.filter(p => {
+        const pNet = p.scores.filter(s => s.holeNumber <= currentHole)
+          .reduce((sum, score) => sum + score.netScore, 0);
+        return pNet === leaderNet;
+      });
+      
+      return ties.length > 1 ? 'AS' : 'UP';
+    }
+    
+    const playerNet = player.scores.filter(s => s.holeNumber <= currentHole)
+      .reduce((sum, score) => sum + score.netScore, 0);
+    const leaderNet = leader.scores.filter(s => s.holeNumber <= currentHole)
+      .reduce((sum, score) => sum + score.netScore, 0);
+    
+    const diff = playerNet - leaderNet;
+    const holesRemaining = 18 - currentHole;
+    
+    if (diff === 0) return 'AS';
+    if (Math.abs(diff) >= holesRemaining) {
+      return diff > 0 ? `${diff} DOWN` : `${Math.abs(diff)} UP`;
+    }
+    return diff > 0 ? `${diff} DN` : `${Math.abs(diff)} UP`;
+  };
+
+  const getStatusColor = (status: string | null) => {
+    if (!status) return 'text-gray-400';
+    if (status === 'E' || status === 'AS') return 'text-blue-400';
+    if (status === 'UP' || status.includes('UP')) return 'text-green-400';
+    if (status.includes('DN') || status.includes('DOWN')) return 'text-red-400';
+    if (status.startsWith('-')) return 'text-green-400';
+    if (status.startsWith('+')) return 'text-red-400';
+    return 'text-gray-400';
+  };
+
   return (
     <div className="min-h-screen bg-dark-bg">
       {/* Header with hole info */}
@@ -63,6 +130,19 @@ export function ModernScorecard({
             <div>
               <h1 className="text-lg font-bold text-white">Hoyo {currentHole}</h1>
               <p className="text-sm text-secondary">Par {holeInfo.par}</p>
+              {/* Active Game Formats */}
+              <div className="flex items-center space-x-2 mt-1">
+                {gameFormats.strokePlay && (
+                  <span className="px-2 py-1 bg-blue-600/20 text-blue-400 text-xs rounded-full border border-blue-600/30">
+                    Stroke Play
+                  </span>
+                )}
+                {gameFormats.matchPlay && (
+                  <span className="px-2 py-1 bg-green-600/20 text-green-400 text-xs rounded-full border border-green-600/30">
+                    Match Play
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           
@@ -124,6 +204,26 @@ export function ModernScorecard({
                         <span className={currentScore ? getScoreColor(currentScore.grossScore, holeInfo.par) : 'text-gray-400'}>
                           {currentScore ? `${currentScore.grossScore}` : '—'}
                         </span>
+                      </div>
+                      
+                      {/* Game Format Status Indicators */}
+                      <div className="flex items-center space-x-3 mt-1">
+                        {gameFormats.strokePlay && (
+                          <div className="flex items-center space-x-1">
+                            <span className="text-xs text-gray-400">SP:</span>
+                            <span className={`text-xs font-semibold ${getStatusColor(getStrokePlayStatus(player))}`}>
+                              {getStrokePlayStatus(player) || '—'}
+                            </span>
+                          </div>
+                        )}
+                        {gameFormats.matchPlay && (
+                          <div className="flex items-center space-x-1">
+                            <span className="text-xs text-gray-400">MP:</span>
+                            <span className={`text-xs font-semibold ${getStatusColor(getMatchPlayStatus(player))}`}>
+                              {getMatchPlayStatus(player) || '—'}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
