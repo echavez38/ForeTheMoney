@@ -30,6 +30,10 @@ Mobile-optimized web application for golf scoring and betting calculations speci
   - Hombres: Negras (máxima), Azules, Blancas, Doradas, Plateadas (mínima)
   - Mujeres: Blancas (máxima), Rojas (mínima)
   - Updated all visual indicators with correct colors
+- **FINAL UPDATE**: Applied official Club Campestre de Puebla data from CSV:
+  - All 18 holes with exact par, stroke index, and distances
+  - Six tee positions (Negras, Azules, Blancas, Doradas, Plateadas, Rojas) with precise yardages
+  - Data directly from club's official records
 
 ## User Preferences
 - Spanish language interface
