@@ -40,7 +40,7 @@ export function PinInput({ length = 4, value, onChange, className = '' }: PinInp
   };
 
   return (
-    <div className={`flex space-x-2 justify-center ${className}`}>
+    <div className={`flex space-x-3 justify-center ${className}`}>
       {pins.map((pin, index) => (
         <input
           key={index}
@@ -51,7 +51,7 @@ export function PinInput({ length = 4, value, onChange, className = '' }: PinInp
           value={pin}
           onChange={e => handleChange(index, e.target.value)}
           onKeyDown={e => handleKeyDown(index, e)}
-          className="w-12 h-12 text-center text-xl font-bold bg-dark-card border border-gray-600 rounded-lg text-white focus:border-golf-green focus:outline-none"
+          className="w-14 h-14 text-center text-xl font-bold bg-dark-card border border-gray-600 rounded-xl text-white focus:border-golf-blue focus:outline-none transition-colors"
         />
       ))}
     </div>

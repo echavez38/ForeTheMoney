@@ -3,33 +3,37 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(240, 10%, 3.9%);
+  --background: hsl(210, 20%, 6%);
   --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 3.7%, 15.9%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(240, 10%, 3.9%);
+  --muted: hsl(210, 20%, 12%);
+  --muted-foreground: hsl(210, 10%, 60%);
+  --popover: hsl(210, 20%, 8%);
   --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 3.9%);
+  --card: hsl(210, 20%, 8%);
   --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 3.7%, 15.9%);
-  --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(142, 76%, 36%);
-  --primary-foreground: hsl(355, 7%, 97%);
-  --secondary: hsl(240, 3.7%, 15.9%);
+  --border: hsl(210, 15%, 20%);
+  --input: hsl(210, 20%, 12%);
+  --primary: hsl(205, 95%, 45%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(210, 20%, 15%);
   --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(240, 3.7%, 15.9%);
+  --accent: hsl(210, 20%, 18%);
   --accent-foreground: hsl(0, 0%, 98%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 4.9%, 83.9%);
-  --radius: 0.5rem;
+  --ring: hsl(205, 95%, 45%);
+  --radius: 0.75rem;
   
-  /* Golf-specific colors */
-  --golf-green: hsl(122, 70%, 20%);
-  --golf-light: hsl(122, 62%, 27%);
-  --dark-bg: hsl(0, 0%, 7%);
-  --dark-surface: hsl(0, 0%, 12%);
-  --dark-card: hsl(0, 0%, 17%);
+  /* Golf Pro App colors */
+  --golf-blue: hsl(205, 95%, 45%);
+  --golf-blue-dark: hsl(205, 95%, 35%);
+  --golf-green: hsl(120, 60%, 45%);
+  --golf-success: hsl(142, 76%, 36%);
+  --dark-bg: hsl(210, 20%, 4%);
+  --dark-surface: hsl(210, 20%, 8%);
+  --dark-card: hsl(210, 20%, 12%);
+  --dark-accent: hsl(210, 20%, 18%);
+  --text-secondary: hsl(210, 10%, 60%);
 }
 
 .dark {
@@ -66,12 +70,20 @@
 }
 
 @layer utilities {
+  .golf-blue {
+    background-color: var(--golf-blue);
+  }
+  
+  .golf-blue-dark {
+    background-color: var(--golf-blue-dark);
+  }
+  
   .golf-green {
     background-color: var(--golf-green);
   }
   
-  .golf-light {
-    background-color: var(--golf-light);
+  .golf-success {
+    background-color: var(--golf-success);
   }
   
   .dark-surface {
@@ -82,16 +94,36 @@
     background-color: var(--dark-card);
   }
   
+  .dark-accent {
+    background-color: var(--dark-accent);
+  }
+  
+  .text-golf-blue {
+    color: var(--golf-blue);
+  }
+  
   .text-golf-green {
     color: var(--golf-green);
+  }
+  
+  .text-secondary {
+    color: var(--text-secondary);
+  }
+  
+  .bg-golf-blue {
+    background-color: var(--golf-blue);
+  }
+  
+  .bg-golf-blue-dark {
+    background-color: var(--golf-blue-dark);
   }
   
   .bg-golf-green {
     background-color: var(--golf-green);
   }
   
-  .bg-golf-light {
-    background-color: var(--golf-light);
+  .bg-golf-success {
+    background-color: var(--golf-success);
   }
   
   .bg-dark-surface {
@@ -102,7 +134,24 @@
     background-color: var(--dark-card);
   }
   
+  .bg-dark-accent {
+    background-color: var(--dark-accent);
+  }
+  
+  .border-golf-blue {
+    border-color: var(--golf-blue);
+  }
+  
   .border-golf-green {
     border-color: var(--golf-green);
+  }
+
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
   }
 }

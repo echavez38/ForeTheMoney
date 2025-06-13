@@ -34,87 +34,90 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-dark-bg">
       {/* Header */}
-      <div className="bg-dark-surface px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-golf-green rounded-full flex items-center justify-center">
-            <span className="text-white font-semibold">
-              {user.name.charAt(0).toUpperCase()}
-            </span>
+      <div className="bg-dark-surface px-6 py-6 border-b border-gray-800">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-golf-blue rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">
+                {user.name.charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div>
+              <p className="font-bold text-white text-lg">{user.name}</p>
+              <p className="text-sm text-secondary">Handicap {user.handicap}</p>
+            </div>
           </div>
-          <div>
-            <p className="font-semibold text-white">{user.name}</p>
-            <p className="text-sm text-gray-400">Handicap: {user.handicap}</p>
-          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="p-3 rounded-xl hover:bg-dark-card text-secondary hover:text-white transition-colors"
+          >
+            <LogOut className="h-5 w-5" />
+          </Button>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleLogout}
-          className="p-2 rounded-lg hover:bg-dark-card text-gray-400"
-        >
-          <LogOut className="h-5 w-5" />
-        </Button>
       </div>
 
       {/* Main Content */}
-      <div className="px-6 py-6">
+      <div className="px-6 py-8">
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 gap-4 mb-8">
           <Button
             onClick={() => setLocation('/create-round')}
-            className="bg-golf-green p-6 h-auto rounded-2xl text-center hover:bg-golf-light transition-colors flex flex-col items-center space-y-2"
+            className="bg-golf-blue p-8 h-auto rounded-2xl text-center hover:bg-golf-blue-dark transition-all duration-200 flex items-center justify-between shadow-lg"
           >
-            <Plus className="h-8 w-8" />
-            <div>
-              <p className="font-semibold">Crear Ronda</p>
-              <p className="text-sm text-green-200">Nueva partida</p>
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                <Plus className="h-6 w-6 text-white" />
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-lg text-white">Nueva Ronda</p>
+                <p className="text-sm text-blue-200">Comenzar nueva partida de golf</p>
+              </div>
             </div>
-          </Button>
-          
-          <Button
-            variant="outline"
-            className="bg-dark-surface p-6 h-auto rounded-2xl text-center hover:bg-dark-card transition-colors border-gray-700 flex flex-col items-center space-y-2"
-          >
-            <Users className="h-8 w-8 text-golf-green" />
-            <div>
-              <p className="font-semibold text-white">Unirse</p>
-              <p className="text-sm text-gray-400">A una ronda</p>
+            <div className="text-white opacity-50">
+              <ChevronRight className="h-6 w-6" />
             </div>
           </Button>
         </div>
 
         {/* Recent Rounds */}
         <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-white">Rondas Recientes</h3>
+          <h3 className="text-xl font-bold mb-6 text-white">Rondas Recientes</h3>
           
           {recentRounds.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {recentRounds.map((round) => {
                 const userPlayer = round.players.find(p => p.name === user.name);
                 const winnings = userPlayer?.moneyBalance || 0;
                 
                 return (
-                  <Card key={round.id} className="bg-dark-surface border-gray-700">
-                    <CardContent className="p-4">
+                  <Card key={round.id} className="bg-dark-surface border-gray-700 rounded-2xl shadow-lg">
+                    <CardContent className="p-6">
                       <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <p className="font-semibold text-white">{round.course}</p>
-                          <p className="text-sm text-gray-400">
-                            {new Date(round.createdAt).toLocaleDateString('es-ES')} • {round.holes} hoyos
-                          </p>
-                          <div className="flex items-center space-x-4 mt-2">
-                            <span className="text-sm text-gray-300">
-                              <Users className="inline h-4 w-4 text-golf-green mr-1" />
-                              {round.players.length} jugadores
-                            </span>
-                            <span className={`text-sm font-semibold ${
-                              winnings >= 0 ? 'text-green-400' : 'text-red-400'
-                            }`}>
-                              {winnings >= 0 ? '+' : ''}€{winnings.toFixed(2)}
-                            </span>
+                        <div className="flex items-center space-x-4">
+                          <div className="w-10 h-10 bg-golf-blue bg-opacity-20 rounded-xl flex items-center justify-center">
+                            <span className="text-golf-blue font-bold">⛳</span>
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-bold text-white text-lg">{round.course}</p>
+                            <p className="text-sm text-secondary">
+                              {new Date(round.createdAt).toLocaleDateString('es-ES')} • {round.holes} hoyos
+                            </p>
+                            <div className="flex items-center space-x-4 mt-2">
+                              <span className="text-sm text-secondary flex items-center">
+                                <Users className="h-4 w-4 text-golf-blue mr-1" />
+                                {round.players.length} jugadores
+                              </span>
+                              <span className={`text-sm font-bold ${
+                                winnings >= 0 ? 'text-golf-green' : 'text-red-400'
+                              }`}>
+                                {winnings >= 0 ? '+' : ''}€{winnings.toFixed(2)}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                        <i className="fas fa-chevron-right text-gray-400"></i>
+                        <ChevronRight className="h-5 w-5 text-secondary" />
                       </div>
                     </CardContent>
                   </Card>
@@ -122,10 +125,13 @@ export default function Dashboard() {
               })}
             </div>
           ) : (
-            <Card className="bg-dark-surface border-gray-700">
-              <CardContent className="p-6 text-center">
-                <p className="text-gray-400">No hay rondas recientes</p>
-                <p className="text-sm text-gray-500 mt-1">¡Crea tu primera ronda!</p>
+            <Card className="bg-dark-surface border-gray-700 rounded-2xl">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-dark-card rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">⛳</span>
+                </div>
+                <p className="text-white font-semibold mb-2">No hay rondas recientes</p>
+                <p className="text-sm text-secondary">Comienza tu primera partida de golf</p>
               </CardContent>
             </Card>
           )}

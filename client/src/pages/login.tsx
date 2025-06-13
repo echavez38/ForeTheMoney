@@ -52,36 +52,36 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col justify-center px-6 bg-dark-bg">
       <div className="text-center mb-12">
-        <div className="w-24 h-24 bg-golf-green rounded-full flex items-center justify-center mx-auto mb-6">
-          <i className="fas fa-golf-ball text-3xl text-white"></i>
+        <div className="w-20 h-20 bg-golf-blue rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+          <span className="text-3xl font-bold text-white">⛳</span>
         </div>
-        <h1 className="text-3xl font-bold text-white mb-2">Fore the Money</h1>
-        <p className="text-gray-400">Tu app de apuestas de golf</p>
+        <h1 className="text-3xl font-bold text-white mb-2 text-shadow-sm">Fore the Money</h1>
+        <p className="text-secondary">Scorecard inteligente de golf</p>
       </div>
 
-      <Card className="bg-dark-surface border-gray-700">
-        <CardContent className="p-6">
-          <h2 className="text-xl font-semibold mb-6 text-center text-white">
-            Iniciar Sesión
+      <Card className="bg-dark-surface border-gray-700 shadow-2xl rounded-2xl">
+        <CardContent className="p-8">
+          <h2 className="text-xl font-semibold mb-8 text-center text-white">
+            Configurar Jugador
           </h2>
           
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Nombre
+              <label className="block text-sm font-medium text-secondary mb-3">
+                Nombre del Jugador
               </label>
               <Input
                 type="text"
-                placeholder="Ingresa tu nombre"
+                placeholder="Tu nombre completo"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="bg-dark-card border-gray-600 text-white placeholder-gray-400 focus:border-golf-green"
+                className="bg-dark-card border-gray-600 text-white placeholder-gray-400 focus:border-golf-blue h-12 rounded-xl"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Handicap
+              <label className="block text-sm font-medium text-secondary mb-3">
+                Handicap de Golf
               </label>
               <Input
                 type="number"
@@ -90,34 +90,36 @@ export default function Login() {
                 onChange={(e) => setHandicap(e.target.value)}
                 min="0"
                 max="54"
-                className="bg-dark-card border-gray-600 text-white placeholder-gray-400 focus:border-golf-green"
+                className="bg-dark-card border-gray-600 text-white placeholder-gray-400 focus:border-golf-blue h-12 rounded-xl"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-4">
-                PIN (4 dígitos)
+              <label className="block text-sm font-medium text-secondary mb-4">
+                PIN de Seguridad (4 dígitos)
               </label>
-              <PinInput
-                value={pin}
-                onChange={setPin}
-                className="mb-4"
-              />
+              <div className="flex justify-center">
+                <PinInput
+                  value={pin}
+                  onChange={setPin}
+                  className="mb-4"
+                />
+              </div>
             </div>
           </div>
 
           <Button
             onClick={handleLogin}
-            className="w-full bg-golf-green text-white py-3 mt-6 font-semibold hover:bg-golf-light transition-colors"
+            className="w-full bg-golf-blue text-white py-4 mt-8 font-semibold hover:bg-golf-blue-dark transition-all duration-200 rounded-xl h-14 text-lg"
           >
-            Entrar
+            Comenzar Partida
           </Button>
         </CardContent>
       </Card>
 
       <div className="text-center mt-8">
-        <p className="text-gray-400 text-sm">
-          ¿Primera vez? Tu PIN se guardará de forma segura
+        <p className="text-secondary text-sm">
+          Tu información se guarda localmente en tu dispositivo
         </p>
       </div>
     </div>

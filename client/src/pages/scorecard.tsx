@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { PlayerCard } from '@/components/player-card';
+import { ModernScorecard } from '@/components/modern-scorecard';
 import { StorageManager } from '@/lib/storage';
 import { BettingCalculator } from '@/lib/betting';
 import { Round, DEFAULT_HOLES, HoleInfo } from '@/lib/types';
-import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function Scorecard() {
@@ -71,41 +68,41 @@ export default function Scorecard() {
     StorageManager.setCurrentRound(updatedRound);
   };
 
-  const nextHole = () => {
+  const handleNavigation = (direction: 'prev' | 'next') => {
     if (!round) return;
 
-    // Check if all players have scores for current hole
-    const allPlayersHaveScores = round.players.every(player => 
-      player.scores.some(score => score.holeNumber === round.currentHole)
-    );
+    if (direction === 'next') {
+      // Check if all players have scores for current hole
+      const allPlayersHaveScores = round.players.every(player => 
+        player.scores.some(score => score.holeNumber === round.currentHole)
+      );
 
-    if (!allPlayersHaveScores) {
-      toast({
-        title: "Scores incompletos",
-        description: "Todos los jugadores deben tener puntuación para este hoyo",
-        variant: "destructive",
-      });
-      return;
-    }
+      if (!allPlayersHaveScores) {
+        toast({
+          title: "Scores incompletos",
+          description: "Todos los jugadores deben tener puntuación para este hoyo",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    if (round.currentHole < round.holes) {
-      const updatedRound = { ...round, currentHole: round.currentHole + 1 };
+      if (round.currentHole < round.holes) {
+        const updatedRound = { ...round, currentHole: round.currentHole + 1 };
+        setRound(updatedRound);
+        StorageManager.setCurrentRound(updatedRound);
+        updateCurrentHoleInfo(updatedRound);
+      } else {
+        // Round completed - calculate final betting
+        finishRound();
+      }
+    } else if (direction === 'prev') {
+      if (round.currentHole <= 1) return;
+      
+      const updatedRound = { ...round, currentHole: round.currentHole - 1 };
       setRound(updatedRound);
       StorageManager.setCurrentRound(updatedRound);
       updateCurrentHoleInfo(updatedRound);
-    } else {
-      // Round completed - calculate final betting
-      finishRound();
     }
-  };
-
-  const previousHole = () => {
-    if (!round || round.currentHole <= 1) return;
-
-    const updatedRound = { ...round, currentHole: round.currentHole - 1 };
-    setRound(updatedRound);
-    StorageManager.setCurrentRound(updatedRound);
-    updateCurrentHoleInfo(updatedRound);
   };
 
   const finishRound = () => {
@@ -148,102 +145,15 @@ export default function Scorecard() {
 
   if (!round || !currentHoleInfo) return null;
 
-  const bettingResults = getCurrentHoleBetting();
-
   return (
-    <div className="min-h-screen bg-dark-bg pb-24">
-      {/* Header */}
-      <div className="bg-dark-surface px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setLocation('/create-round')}
-              className="p-2 rounded-lg hover:bg-dark-card text-white"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="font-semibold text-white">{round.course}</h1>
-              <p className="text-sm text-gray-400">
-                Hoyo {round.currentHole} de {round.holes}
-              </p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-gray-400">
-              Par <span className="text-white font-semibold">{currentHoleInfo.par}</span>
-            </p>
-            <p className="text-xs text-gray-400">Handicap {currentHoleInfo.strokeIndex}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Hole Info */}
-      <div className="bg-golf-green bg-opacity-20 px-4 py-3 border-b border-golf-green border-opacity-30">
-        <div className="flex items-center justify-between text-sm text-white">
-          <span>Metros: <span className="font-semibold">{currentHoleInfo.distance}m</span></span>
-          <span>Stroke Index: <span className="font-semibold">#{currentHoleInfo.strokeIndex}</span></span>
-        </div>
-      </div>
-
-      {/* Players Scorecard */}
-      <div className="px-4 py-4 space-y-3">
-        {round.players.map((player) => (
-          <PlayerCard
-            key={player.id}
-            player={player}
-            currentHole={round.currentHole}
-            onScoreChange={handleScoreChange}
-          />
-        ))}
-      </div>
-
-      {/* Betting Summary */}
-      <div className="mx-4 mb-4">
-        <Card className="bg-dark-surface border-gray-700">
-          <CardContent className="p-4">
-            <h3 className="font-semibold mb-3 flex items-center text-white">
-              <i className="fas fa-coins text-golf-green mr-2"></i>
-              Apuestas del Hoyo
-            </h3>
-            <div className="space-y-2 text-sm">
-              {bettingResults.map((result, index) => (
-                <div key={index} className="flex justify-between">
-                  <span className="text-gray-300 capitalize">{result.type}:</span>
-                  <span className={result.winner ? "text-golf-green font-semibold" : "text-gray-400"}>
-                    {result.tied ? 'Empate' : result.winner ? `${result.winner} (+€${result.amount.toFixed(2)})` : 'Sin ganador'}
-                  </span>
-                </div>
-              ))}
-              {bettingResults.length === 0 && (
-                <p className="text-gray-400">Completa las puntuaciones para ver las apuestas</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Navigation */}
-      <div className="fixed bottom-6 left-4 right-4 flex space-x-3">
-        <Button
-          onClick={previousHole}
-          disabled={round.currentHole <= 1}
-          variant="outline"
-          className="flex-1 bg-dark-surface border-gray-600 text-white py-3 hover:bg-dark-card transition-colors disabled:opacity-50"
-        >
-          <ChevronLeft className="h-4 w-4 mr-2" />
-          Anterior
-        </Button>
-        <Button
-          onClick={nextHole}
-          className="flex-1 bg-golf-green text-white py-3 hover:bg-golf-light transition-colors"
-        >
-          {round.currentHole >= round.holes ? 'Finalizar' : 'Siguiente'}
-          <ChevronRight className="h-4 w-4 ml-2" />
-        </Button>
-      </div>
-    </div>
+    <ModernScorecard
+      players={round.players}
+      currentHole={round.currentHole}
+      holeInfo={currentHoleInfo}
+      onScoreChange={handleScoreChange}
+      onNavigate={handleNavigation}
+      canGoNext={true}
+      canGoPrev={round.currentHole > 1}
+    />
   );
 }
