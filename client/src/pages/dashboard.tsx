@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { StorageManager } from '@/lib/storage';
 import { User, Round } from '@/lib/types';
-import { Plus, Users, History, BarChart3, Settings, LogOut } from 'lucide-react';
+import { Plus, Users, History, BarChart3, Settings, LogOut, ChevronRight } from 'lucide-react';
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -138,21 +138,27 @@ export default function Dashboard() {
         </div>
 
         {/* Statistics */}
-        <Card className="bg-dark-surface border-gray-700">
+        <Card className="bg-dark-surface border-gray-700 rounded-2xl shadow-lg">
           <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-4 text-white">Estadísticas</h3>
+            <h3 className="text-xl font-bold mb-6 text-white">Estadísticas</h3>
             <div className="grid grid-cols-2 gap-6">
-              <div className="text-center">
+              <div className="text-center p-4 bg-dark-card rounded-xl">
+                <div className="w-12 h-12 bg-golf-green bg-opacity-20 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <span className="text-golf-green text-xl">€</span>
+                </div>
                 <p className={`text-2xl font-bold ${
                   stats.totalWinnings >= 0 ? 'text-golf-green' : 'text-red-400'
                 }`}>
                   {stats.totalWinnings >= 0 ? '+' : ''}€{stats.totalWinnings.toFixed(2)}
                 </p>
-                <p className="text-sm text-gray-400">Ganancias Totales</p>
+                <p className="text-sm text-secondary mt-1">Ganancias Totales</p>
               </div>
-              <div className="text-center">
+              <div className="text-center p-4 bg-dark-card rounded-xl">
+                <div className="w-12 h-12 bg-golf-blue bg-opacity-20 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <span className="text-golf-blue text-xl">🏆</span>
+                </div>
                 <p className="text-2xl font-bold text-white">{stats.roundsPlayed}</p>
-                <p className="text-sm text-gray-400">Rondas Jugadas</p>
+                <p className="text-sm text-secondary mt-1">Rondas Jugadas</p>
               </div>
             </div>
           </CardContent>
@@ -160,23 +166,25 @@ export default function Dashboard() {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-dark-surface border-t border-gray-700">
-        <div className="flex">
-          <button className="flex-1 py-4 text-center border-b-2 border-golf-green">
-            <i className="fas fa-home text-golf-green mb-1 block"></i>
-            <p className="text-xs text-golf-green">Inicio</p>
+      <div className="fixed bottom-0 left-0 right-0 bg-dark-surface border-t border-gray-800 safe-area-pb">
+        <div className="flex px-2 py-2">
+          <button className="flex-1 py-3 text-center rounded-xl bg-golf-blue bg-opacity-20">
+            <div className="w-6 h-6 mx-auto mb-1 flex items-center justify-center">
+              <span className="text-golf-blue">🏠</span>
+            </div>
+            <p className="text-xs text-golf-blue font-semibold">Inicio</p>
           </button>
-          <button className="flex-1 py-4 text-center">
-            <History className="h-4 w-4 text-gray-400 mb-1 mx-auto" />
-            <p className="text-xs text-gray-400">Historial</p>
+          <button className="flex-1 py-3 text-center">
+            <History className="h-5 w-5 text-secondary mb-1 mx-auto" />
+            <p className="text-xs text-secondary">Historial</p>
           </button>
-          <button className="flex-1 py-4 text-center">
-            <BarChart3 className="h-4 w-4 text-gray-400 mb-1 mx-auto" />
-            <p className="text-xs text-gray-400">Stats</p>
+          <button className="flex-1 py-3 text-center">
+            <BarChart3 className="h-5 w-5 text-secondary mb-1 mx-auto" />
+            <p className="text-xs text-secondary">Stats</p>
           </button>
-          <button className="flex-1 py-4 text-center">
-            <Settings className="h-4 w-4 text-gray-400 mb-1 mx-auto" />
-            <p className="text-xs text-gray-400">Config</p>
+          <button className="flex-1 py-3 text-center">
+            <Settings className="h-5 w-5 text-secondary mb-1 mx-auto" />
+            <p className="text-xs text-secondary">Config</p>
           </button>
         </div>
       </div>
