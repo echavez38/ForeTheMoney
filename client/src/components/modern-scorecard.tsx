@@ -68,10 +68,12 @@ export function ModernScorecard({
           
           <div className="flex items-center space-x-2">
             <div className={`w-4 h-4 rounded-full ${
+              selectedTees.color === 'negras' ? 'bg-black border border-gray-400' :
+              selectedTees.color === 'azules' ? 'bg-blue-500' :
+              selectedTees.color === 'blancas' ? 'bg-white border border-gray-400' :
               selectedTees.color === 'doradas' ? 'bg-yellow-400' :
-              selectedTees.color === 'azules' ? 'bg-blue-400' :
-              selectedTees.color === 'blancas' ? 'bg-gray-200' :
-              'bg-red-400'
+              selectedTees.color === 'plateadas' ? 'bg-gray-400' :
+              'bg-red-500'
             }`} />
             <div className="bg-golf-blue rounded-full w-12 h-12 flex items-center justify-center">
               <span className="text-white font-bold text-lg">{holeInfo.par}</span>
@@ -173,10 +175,12 @@ export function ModernScorecard({
               </h3>
               <div className="flex items-center space-x-2 text-sm text-secondary">
                 <div className={`w-3 h-3 rounded-full ${
+                  selectedTees.color === 'negras' ? 'bg-black border border-gray-400' :
+                  selectedTees.color === 'azules' ? 'bg-blue-500' :
+                  selectedTees.color === 'blancas' ? 'bg-white border border-gray-400' :
                   selectedTees.color === 'doradas' ? 'bg-yellow-400' :
-                  selectedTees.color === 'azules' ? 'bg-blue-400' :
-                  selectedTees.color === 'blancas' ? 'bg-gray-200' :
-                  'bg-red-400'
+                  selectedTees.color === 'plateadas' ? 'bg-gray-400' :
+                  'bg-red-500'
                 }`} />
                 <span>{selectedTees.name}</span>
               </div>

@@ -22,7 +22,7 @@ export default function CreateRound() {
     foursomes: false,
     unitPerHole: 1.0,
   });
-  const [selectedTees, setSelectedTees] = useState<TeeSelection>(TEE_OPTIONS[2]); // Default to Blancas
+  const [selectedTees, setSelectedTees] = useState<TeeSelection>(TEE_OPTIONS[2]); // Default to Blancas (ambos géneros)
   const [newPlayerName, setNewPlayerName] = useState('');
   const [newPlayerHandicap, setNewPlayerHandicap] = useState('18');
   const { toast } = useToast();
@@ -212,10 +212,12 @@ export default function CreateRound() {
                 >
                   <div className="flex items-center space-x-3">
                     <div className={`w-4 h-4 rounded-full ${
+                      tee.color === 'negras' ? 'bg-black border border-gray-400' :
+                      tee.color === 'azules' ? 'bg-blue-500' :
+                      tee.color === 'blancas' ? 'bg-white border border-gray-400' :
                       tee.color === 'doradas' ? 'bg-yellow-400' :
-                      tee.color === 'azules' ? 'bg-blue-400' :
-                      tee.color === 'blancas' ? 'bg-gray-200' :
-                      'bg-red-400'
+                      tee.color === 'plateadas' ? 'bg-gray-400' :
+                      'bg-red-500'
                     }`} />
                     <div>
                       <p className="font-semibold text-white">{tee.name}</p>

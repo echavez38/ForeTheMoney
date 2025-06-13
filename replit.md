@@ -13,7 +13,9 @@ Mobile-optimized web application for golf scoring and betting calculations speci
 ## Golf Course Data
 **Club Campestre de Puebla** - Only available golf course in the application
 - 18 holes with official par, stroke index, and distance data
-- Four tee options: Doradas, Azules, Blancas, Rojas
+- Six tee options with proper gender segregation:
+  - **Hombres** (mayor a menor dificultad): Negras, Azules, Blancas, Doradas, Plateadas
+  - **Mujeres**: Blancas, Rojas
 - Distances in meters for each tee position
 - Authentic data from club's official scorecard
 
@@ -24,6 +26,10 @@ Mobile-optimized web application for golf scoring and betting calculations speci
 - Added comprehensive tee selection system with visual indicators
 - Implemented distance display based on selected tees
 - Pre-selected Club Campestre de Puebla as default course choice
+- **CORRECTED**: Fixed tee system to proper Club Campestre configuration:
+  - Hombres: Negras (máxima), Azules, Blancas, Doradas, Plateadas (mínima)
+  - Mujeres: Blancas (máxima), Rojas (mínima)
+  - Updated all visual indicators with correct colors
 
 ## User Preferences
 - Spanish language interface
