@@ -107,6 +107,13 @@ Mobile-optimized web application for golf scoring and betting calculations speci
   - Confirmation toast message when abandoning a round
   - Clears current round from storage and returns to dashboard
   - Prevents loss of progress for completed holes
+- **OYESES (CLOSEST TO PIN) BETTING**: Implemented par 3 betting system:
+  - Special section appears only on par 3 holes when Oyeses betting is enabled
+  - Players can select who won "closest to pin" for each par 3
+  - Visual interface with yellow gradient and target icons
+  - Winner receives money from all players (unitPerHole × player count)
+  - Integration with overall betting calculations and debriefing results
+  - Persistent storage of Oyeses winners per hole in round data
 
 ## User Preferences
 - Spanish language interface

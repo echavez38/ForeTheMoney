@@ -39,6 +39,21 @@ export class BettingCalculator {
       });
     }
 
+    // Oyeses (Closest to Pin) for Par 3s only
+    if (bettingOptions.oyeses && holeInfo.par === 3) {
+      const oyesesWinner = players.find(player => {
+        const score = player.scores.find(s => s.holeNumber === holeInfo.number);
+        return score?.oyesesWinner === player.id;
+      });
+
+      results.push({
+        type: 'oyeses',
+        winner: oyesesWinner ? oyesesWinner.name : null,
+        amount: oyesesWinner ? bettingOptions.unitPerHole * players.length : 0,
+        tied: false,
+      });
+    }
+
     return results;
   }
 
@@ -73,6 +88,40 @@ export class BettingCalculator {
     const segmentHoles = segment === 'frontNine' ? [1,2,3,4,5,6,7,8,9] :
                         segment === 'backNine' ? [10,11,12,13,14,15,16,17,18] :
                         [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18];
+
+    // Add Oyeses earnings to player balances first
+    if (round.bettingOptions.oyeses) {
+      const par3Holes = segment === 'frontNine' ? [1,2,3,4,5,6,7,8,9].filter(h => {
+        const holeInfo = round.players[0]?.scores.find(s => s.holeNumber === h);
+        return holeInfo?.par === 3;
+      }) : segment === 'backNine' ? [10,11,12,13,14,15,16,17,18].filter(h => {
+        const holeInfo = round.players[0]?.scores.find(s => s.holeNumber === h);
+        return holeInfo?.par === 3;
+      }) : [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18].filter(h => {
+        const holeInfo = round.players[0]?.scores.find(s => s.holeNumber === h);
+        return holeInfo?.par === 3;
+      });
+
+      par3Holes.forEach(holeNumber => {
+        const oyesesWinner = round.players.find(player => {
+          const score = player.scores.find(s => s.holeNumber === holeNumber);
+          return score?.oyesesWinner === player.id;
+        });
+
+        if (oyesesWinner) {
+          const winAmount = round.bettingOptions.unitPerHole * round.players.length;
+          combinedBalances[oyesesWinner.id] += winAmount;
+          totalPot += winAmount;
+
+          // Others lose their bet
+          round.players.forEach(player => {
+            if (player.id !== oyesesWinner.id) {
+              combinedBalances[player.id] -= round.bettingOptions.unitPerHole;
+            }
+          });
+        }
+      });
+    }
 
     // Calculate Stroke Play if enabled and segment is active
     if (round.gameFormats.strokePlay && round.bettingOptions.segments[segment]) {
