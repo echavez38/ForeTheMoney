@@ -46,6 +46,9 @@ Mobile-optimized web application for golf scoring and betting calculations speci
   - Back Nine (holes 10-18) betting  
   - Total 18-hole betting
   - Each segment can be enabled/disabled independently
+  - **Custom Stroke Play bet amounts**: Individual values for each segment (€10 front, €10 back, €20 total by default)
+  - Configuration interface shows only enabled segments
+  - Backward compatibility for existing rounds
 - **DUAL FORMAT SYSTEM**: Enhanced game format selection:
   - Stroke Play and Match Play can be selected simultaneously
   - Independent calculations for each format when both enabled
