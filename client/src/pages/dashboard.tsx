@@ -112,7 +112,7 @@ export default function Dashboard() {
                               <span className={`text-sm font-bold ${
                                 winnings >= 0 ? 'text-golf-green' : 'text-red-400'
                               }`}>
-                                {winnings >= 0 ? '+' : ''}€{winnings.toFixed(2)}
+                                {winnings >= 0 ? '+' : ''}${winnings.toFixed(2)}
                               </span>
                             </div>
                           </div>
@@ -144,12 +144,12 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center p-4 bg-dark-card rounded-xl">
                 <div className="w-12 h-12 bg-golf-green bg-opacity-20 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <span className="text-golf-green text-xl">€</span>
+                  <span className="text-golf-green text-xl">$</span>
                 </div>
                 <p className={`text-2xl font-bold ${
                   stats.totalWinnings >= 0 ? 'text-golf-green' : 'text-red-400'
                 }`}>
-                  {stats.totalWinnings >= 0 ? '+' : ''}€{stats.totalWinnings.toFixed(2)}
+                  {stats.totalWinnings >= 0 ? '+' : ''}${stats.totalWinnings.toFixed(2)}
                 </p>
                 <p className="text-sm text-secondary mt-1">Ganancias Totales</p>
               </div>

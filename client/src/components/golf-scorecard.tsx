@@ -403,7 +403,7 @@ export function GolfScorecard({ round }: GolfScorecardProps) {
                       </p>
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-yellow-400">€{player.moneyBalance.toFixed(2)}</p>
+                      <p className="text-2xl font-bold text-yellow-400">${player.moneyBalance.toFixed(2)}</p>
                       <p className="text-sm text-gray-400">Apuestas</p>
                       <p className="text-xs text-gray-500">Balance</p>
                     </div>

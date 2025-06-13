@@ -114,7 +114,7 @@ export default function Results() {
                 <p className={`text-xl font-bold ${
                   player.moneyBalance >= 0 ? 'text-white' : 'text-red-200'
                 }`}>
-                  {player.moneyBalance >= 0 ? '+' : ''}€{player.moneyBalance.toFixed(2)}
+                  {player.moneyBalance >= 0 ? '+' : ''}${player.moneyBalance.toFixed(2)}
                 </p>
               </div>
             ))}
@@ -193,7 +193,7 @@ export default function Results() {
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-blue-400 font-medium">Stroke Play</span>
-                        <span className="text-sm text-gray-400">€{segmentResults.frontNine.strokePlay.totalPot.toFixed(2)}</span>
+                        <span className="text-sm text-gray-400">${segmentResults.frontNine.strokePlay.totalPot.toFixed(2)}</span>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         {Object.entries(segmentResults.frontNine.strokePlay.playerBalances).map(([playerId, amount]) => {
@@ -204,7 +204,7 @@ export default function Results() {
                               <span className={`text-sm font-medium ${
                                 amount > 0 ? 'text-green-400' : amount < 0 ? 'text-red-400' : 'text-gray-400'
                               }`}>
-                                {amount > 0 ? '+' : ''}€{amount.toFixed(2)}
+                                {amount > 0 ? '+' : ''}${amount.toFixed(2)}
                               </span>
                             </div>
                           ) : null;
@@ -218,7 +218,7 @@ export default function Results() {
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-green-400 font-medium">Match Play</span>
-                        <span className="text-sm text-gray-400">€{segmentResults.frontNine.matchPlay.totalPot.toFixed(2)}</span>
+                        <span className="text-sm text-gray-400">${segmentResults.frontNine.matchPlay.totalPot.toFixed(2)}</span>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         {Object.entries(segmentResults.frontNine.matchPlay.playerBalances).map(([playerId, amount]) => {
@@ -229,7 +229,7 @@ export default function Results() {
                               <span className={`text-sm font-medium ${
                                 amount > 0 ? 'text-green-400' : amount < 0 ? 'text-red-400' : 'text-gray-400'
                               }`}>
-                                {amount > 0 ? '+' : ''}€{amount.toFixed(2)}
+                                {amount > 0 ? '+' : ''}${amount.toFixed(2)}
                               </span>
                             </div>
                           ) : null;
@@ -245,7 +245,7 @@ export default function Results() {
                 <div className="p-4 bg-dark-card rounded-lg">
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="font-medium text-white">Back Nine (Hoyos 10-18)</h4>
-                    <span className="text-sm text-gray-400">€{segmentResults.backNine.totalPot.toFixed(2)}</span>
+                    <span className="text-sm text-gray-400">${segmentResults.backNine.totalPot.toFixed(2)}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     {Object.entries(segmentResults.backNine.playerBalances).map(([playerId, amount]) => {
@@ -256,7 +256,7 @@ export default function Results() {
                           <span className={`text-sm font-medium ${
                             amount > 0 ? 'text-green-400' : amount < 0 ? 'text-red-400' : 'text-gray-400'
                           }`}>
-                            {amount > 0 ? '+' : ''}€{amount.toFixed(2)}
+                            {amount > 0 ? '+' : ''}${amount.toFixed(2)}
                           </span>
                         </div>
                       ) : null;
@@ -270,7 +270,7 @@ export default function Results() {
                 <div className="p-4 bg-dark-card rounded-lg">
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="font-medium text-white">Total (18 Hoyos)</h4>
-                    <span className="text-sm text-gray-400">€{segmentResults.total.totalPot.toFixed(2)}</span>
+                    <span className="text-sm text-gray-400">${segmentResults.total.totalPot.toFixed(2)}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     {Object.entries(segmentResults.total.playerBalances).map(([playerId, amount]) => {
@@ -281,7 +281,7 @@ export default function Results() {
                           <span className={`text-sm font-medium ${
                             amount > 0 ? 'text-green-400' : amount < 0 ? 'text-red-400' : 'text-gray-400'
                           }`}>
-                            {amount > 0 ? '+' : ''}€{amount.toFixed(2)}
+                            {amount > 0 ? '+' : ''}${amount.toFixed(2)}
                           </span>
                         </div>
                       ) : null;
@@ -304,7 +304,7 @@ export default function Results() {
                     <span className="px-3 py-1 bg-purple-600 rounded-full text-xs text-white">Foursomes</span>
                   )}
                   <span className="px-3 py-1 bg-gray-600 rounded-full text-xs text-white">
-                    €{round.bettingOptions.unitPerHole}/hoyo
+                    ${round.bettingOptions.unitPerHole}/hoyo
                   </span>
                 </div>
               </div>
