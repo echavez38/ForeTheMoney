@@ -11,6 +11,7 @@ export interface Round {
   holes: number;
   players: RoundPlayer[];
   currentHole: number;
+  gameFormat: 'stroke' | 'match';
   bettingOptions: BettingOptions;
   completed: boolean;
   createdAt: Date;
@@ -40,6 +41,11 @@ export interface BettingOptions {
   oyeses: boolean;
   foursomes: boolean;
   unitPerHole: number;
+  segments: {
+    frontNine: boolean;
+    backNine: boolean;
+    total: boolean;
+  };
 }
 
 export interface HoleInfo {
