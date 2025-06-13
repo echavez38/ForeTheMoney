@@ -152,41 +152,40 @@ export function ModernScorecard({
         })}
       </div>
 
-      {/* Hole Stats */}
+      {/* Player Tee Information */}
       <div className="mx-4 mb-4">
         <Card className="bg-dark-card border-gray-700">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-white flex items-center">
-                <Target className="h-4 w-4 text-golf-blue mr-2" />
-                Información del Hoyo
-              </h3>
-              <div className="flex items-center space-x-2 text-sm text-secondary">
-                <div className={`w-3 h-3 rounded-full ${
-                  selectedTees.color === 'negras' ? 'bg-black border border-gray-400' :
-                  selectedTees.color === 'azules' ? 'bg-blue-500' :
-                  selectedTees.color === 'blancas' ? 'bg-white border border-gray-400' :
-                  selectedTees.color === 'doradas' ? 'bg-yellow-400' :
-                  selectedTees.color === 'plateadas' ? 'bg-gray-400' :
-                  'bg-red-500'
-                }`} />
-                <span>{selectedTees.name}</span>
-              </div>
-            </div>
+            <h3 className="font-semibold text-white flex items-center mb-3">
+              <Target className="h-4 w-4 text-golf-blue mr-2" />
+              Información por Jugador
+            </h3>
             
-            <div className="grid grid-cols-3 gap-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-golf-blue">{holeInfo.strokeIndex[selectedTees.color]}</p>
-                <p className="text-xs text-secondary">Índice HCP</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-white">{holeInfo.distances[selectedTees.color]}m</p>
-                <p className="text-xs text-secondary">Distancia</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-golf-green">Par {holeInfo.par}</p>
-                <p className="text-xs text-secondary">Par del Hoyo</p>
-              </div>
+            <div className="space-y-3">
+              {players.map((player) => (
+                <div key={player.id} className="flex items-center justify-between p-2 bg-dark-surface rounded">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-6 h-6 bg-golf-green rounded-full flex items-center justify-center">
+                      <span className="text-xs font-semibold text-white">
+                        {player.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <span className="text-white font-medium">{player.name}</span>
+                    <div className={`w-3 h-3 rounded-full ${
+                      player.selectedTee.color === 'negras' ? 'bg-black border border-gray-400' :
+                      player.selectedTee.color === 'azules' ? 'bg-blue-500' :
+                      player.selectedTee.color === 'blancas' ? 'bg-white border border-gray-400' :
+                      player.selectedTee.color === 'doradas' ? 'bg-yellow-400' :
+                      player.selectedTee.color === 'plateadas' ? 'bg-gray-400' :
+                      'bg-red-500'
+                    }`} />
+                  </div>
+                  <div className="text-right text-sm">
+                    <p className="text-white">{holeInfo.distances[player.selectedTee.color]}m</p>
+                    <p className="text-secondary">HCP {holeInfo.strokeIndex[player.selectedTee.color]}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>

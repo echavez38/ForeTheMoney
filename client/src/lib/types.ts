@@ -12,7 +12,6 @@ export interface Round {
   players: RoundPlayer[];
   currentHole: number;
   bettingOptions: BettingOptions;
-  selectedTees: TeeSelection;
   completed: boolean;
   createdAt: Date;
 }
