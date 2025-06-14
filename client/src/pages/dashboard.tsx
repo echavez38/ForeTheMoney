@@ -83,6 +83,24 @@ export default function Dashboard() {
           </Button>
           
           <Button
+            onClick={() => setLocation('/multiplayer')}
+            className="bg-gradient-to-r from-orange-600 to-red-600 p-6 h-auto rounded-2xl text-center hover:from-orange-700 hover:to-red-700 transition-all duration-200 flex items-center justify-between shadow-lg"
+          >
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                <Users className="h-6 w-6 text-white" />
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-lg text-white">Multijugador</p>
+                <p className="text-sm text-orange-200">Crear o unirse a partidas online</p>
+              </div>
+            </div>
+            <div className="text-white opacity-50">
+              <ChevronRight className="h-6 w-6" />
+            </div>
+          </Button>
+          
+          <Button
             onClick={() => setLocation('/analytics')}
             className="bg-gradient-to-r from-purple-600 to-blue-600 p-6 h-auto rounded-2xl text-center hover:from-purple-700 hover:to-blue-700 transition-all duration-200 flex items-center justify-between shadow-lg"
           >
