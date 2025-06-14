@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
+import bcrypt from "bcryptjs";
 import { storage } from "./storage";
 import { emailService } from "./email";
 import { SubscriptionService } from "./subscription";
@@ -236,6 +237,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error(`Error updating handicap from GHIN: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // User management routes
+  app.get("/api/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+
+      // Don't return sensitive data
+      const { password, pin, ...userResponse } = user;
+      res.json(userResponse);
+    } catch (error) {
+      console.error(`Error fetching user: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.patch("/api/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const updates = req.body;
+
+      // Validate that user exists
+      const existingUser = await storage.getUser(userId);
+      if (!existingUser) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+
+      // Update user profile
+      const updatedUser = await storage.updateUser(userId, updates);
+      
+      // Don't return sensitive data
+      const { password, pin, ...userResponse } = updatedUser;
+      res.json(userResponse);
+    } catch (error) {
+      console.error(`Error updating user: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.delete("/api/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      
+      // Validate that user exists
+      const existingUser = await storage.getUser(userId);
+      if (!existingUser) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+
+      await storage.deleteUser(userId);
+      res.json({ success: true, message: "Usuario eliminado correctamente" });
+    } catch (error) {
+      console.error(`Error deleting user: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Change credentials route
+  app.post("/api/auth/change-credentials/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { newPassword, newPin } = req.body;
+
+      // Validate that user exists
+      const existingUser = await storage.getUser(userId);
+      if (!existingUser) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+
+      const updates: any = {};
+      
+      if (newPassword) {
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        updates.password = hashedPassword;
+        updates.authType = 'password';
+        updates.pin = null; // Clear PIN when setting password
+      } else if (newPin) {
+        updates.pin = newPin;
+        updates.authType = 'pin';
+        updates.password = null; // Clear password when setting PIN
+      } else {
+        return res.status(400).json({ error: "Nueva contraseña o PIN requerido" });
+      }
+
+      await storage.updateUser(userId, updates);
+      res.json({ success: true, message: "Credenciales actualizadas correctamente" });
+    } catch (error) {
+      console.error(`Error changing credentials: ${error}`);
       res.status(500).json({ error: "Error interno del servidor" });
     }
   });

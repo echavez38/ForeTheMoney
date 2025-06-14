@@ -90,7 +90,7 @@ export default function SettingsPage() {
   });
 
   // Fetch subscription info
-  const { data: subscriptionInfo } = useQuery({
+  const { data: subscriptionInfo } = useQuery<SubscriptionInfo>({
     queryKey: ['/api/subscription/info', currentUser?.id],
     enabled: !!currentUser?.id
   });
@@ -591,7 +591,7 @@ export default function SettingsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {subscriptionInfo && (
+                {subscriptionInfo ? (
                   <>
                     <div className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
                       <div>
@@ -672,6 +672,8 @@ export default function SettingsPage() {
                       </Button>
                     )}
                   </>
+                ) : (
+                  <div className="text-center text-gray-400">Cargando información de suscripción...</div>
                 )}
               </CardContent>
             </Card>

@@ -21,6 +21,8 @@ export interface IStorage {
   }): Promise<void>;
   incrementRoundCount(userId: number): Promise<void>;
   updateHandicap(userId: number, handicap: number): Promise<void>;
+  updateUser(userId: number, updates: Partial<User>): Promise<User>;
+  deleteUser(userId: number): Promise<void>;
   
   // Round operations
   createRound(round: InsertRound): Promise<Round>;
@@ -180,6 +182,26 @@ export class DatabaseStorage implements IStorage {
         handicapVerified: true,
         handicapLastVerified: new Date()
       })
+      .where(eq(users.id, userId));
+  }
+
+  async updateUser(userId: number, updates: Partial<User>): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, userId))
+      .returning();
+    
+    if (!updatedUser) {
+      throw new Error('User not found');
+    }
+    
+    return updatedUser;
+  }
+
+  async deleteUser(userId: number): Promise<void> {
+    await db
+      .delete(users)
       .where(eq(users.id, userId));
   }
 
