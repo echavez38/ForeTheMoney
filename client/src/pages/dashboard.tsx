@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { StorageManager } from '@/lib/storage';
 import { User, Round } from '@/lib/types';
-import { Plus, Users, History, BarChart3, Settings, LogOut, ChevronRight, TrendingUp, Target, Trophy, Calendar } from 'lucide-react';
+import { Plus, Users, History, BarChart3, Settings, LogOut, ChevronRight, TrendingUp, Target, Trophy, Calendar, Crown } from 'lucide-react';
 import { AchievementBadge, getAchievements } from '@/components/achievement-badge';
 import { BottomNavigation } from '@/components/bottom-navigation';
 
@@ -49,14 +49,23 @@ export default function Dashboard() {
               <p className="text-sm text-secondary">Handicap {user.handicap}</p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
-            className="p-3 rounded-xl hover:bg-dark-card text-secondary hover:text-white transition-colors"
-          >
-            <LogOut className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center space-x-3">
+            <Button
+              onClick={() => setLocation('/subscription')}
+              className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black px-4 py-2 rounded-xl font-semibold text-sm"
+            >
+              <Crown className="h-4 w-4 mr-2" />
+              Premium
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="p-3 rounded-xl hover:bg-dark-card text-secondary hover:text-white transition-colors"
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
       </div>
 

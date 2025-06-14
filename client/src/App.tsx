@@ -12,6 +12,7 @@ import RoundDebrief from "@/pages/round-debrief";
 import Analytics from "@/pages/analytics";
 import GolfScorecardPage from "@/pages/golf-scorecard";
 import MultiplayerLobby from "@/pages/multiplayer-lobby";
+import Subscription from "@/pages/subscription";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/golf-scorecard" component={GolfScorecardPage} />
       <Route path="/multiplayer" component={MultiplayerLobby} />
       <Route path="/analytics" component={Analytics} />
+      <Route path="/subscription" component={Subscription} />
       <Route path="/results" component={Results} />
       <Route path="/round-debrief" component={RoundDebrief} />
       <Route component={NotFound} />

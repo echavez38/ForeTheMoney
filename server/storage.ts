@@ -14,6 +14,12 @@ export interface IStorage {
   registerUser(userData: RegisterUser): Promise<User>;
   authenticateUser(loginData: LoginUser): Promise<User | null>;
   updateLastLogin(userId: number): Promise<void>;
+  updateSubscription(userId: number, subscriptionData: {
+    subscriptionType: string;
+    subscriptionStartDate: Date;
+    subscriptionEndDate: Date;
+  }): Promise<void>;
+  incrementRoundCount(userId: number): Promise<void>;
   
   // Round operations
   createRound(round: InsertRound): Promise<Round>;
