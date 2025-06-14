@@ -281,22 +281,7 @@ export function ModernScorecard({
                   </Button>
                 </div>
 
-                {isSelected && (
-                  <div className="mt-4 pt-4 border-t border-gray-700">
-                    <ModernScoreInput
-                      selectedScore={currentScore?.grossScore || null}
-                      onScoreSelect={(score) => {
-                        onScoreChange(player.id, score);
-                        setSelectedPlayer(null);
-                      }}
-                      par={holeInfo.par}
-                      playerName={player.name}
-                      handicap={player.handicap}
-                      strokeIndex={holeInfo.strokeIndex[player.selectedTee.color]}
-                      maxScore={10}
-                    />
-                  </div>
-                )}
+
               </CardContent>
             </Card>
           );
@@ -531,6 +516,23 @@ export function ModernScorecard({
           </Button>
         </div>
       </div>
+
+      {/* Modern Score Entry Modal */}
+      {activePlayer && (
+        <ScoreEntryModal
+          isOpen={scoreModalOpen}
+          onClose={() => {
+            setScoreModalOpen(false);
+            setActivePlayer(null);
+          }}
+          player={activePlayer}
+          holeInfo={holeInfo}
+          currentScore={activePlayer.scores.find(s => s.holeNumber === currentHole)?.grossScore}
+          onScoreSubmit={(score) => {
+            onScoreChange(activePlayer.id, score);
+          }}
+        />
+      )}
     </div>
   );
 }
