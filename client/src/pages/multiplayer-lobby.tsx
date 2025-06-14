@@ -302,41 +302,43 @@ export default function MultiplayerLobby() {
         {/* Join Room */}
         {mode === 'join' && (
           <div className="space-y-4">
-            <Card className="bg-dark-surface border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white text-center">Unirse a Partida</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
-                    Código de Partida
-                  </label>
-                  <Input
-                    value={joinCode}
-                    onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                    placeholder="Ej: ABC123"
-                    maxLength={6}
-                    className="bg-dark-card border-gray-600 text-white text-center text-lg font-mono"
-                  />
-                </div>
-                
-                <Button
-                  onClick={joinRoom}
-                  disabled={isLoading || !joinCode.trim() || !isConnected}
-                  className="w-full bg-golf-green text-white py-3 font-semibold hover:bg-golf-light"
-                >
-                  {isLoading ? 'Conectando...' : 'Unirse'}
-                </Button>
-                
-                <Button
-                  onClick={() => setMode('menu')}
-                  variant="ghost"
-                  className="w-full text-gray-400 hover:text-white"
-                >
-                  Cancelar
-                </Button>
-              </CardContent>
-            </Card>
+            <FloatingElement delay={0.1} intensity="moderate">
+              <Card className="bg-dark-surface/80 backdrop-blur-md border-gray-700/50 shadow-2xl">
+                <CardHeader>
+                  <CardTitle className="text-white text-center text-xl">Unirse a Partida</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">
+                      Código de Partida
+                    </label>
+                    <Input
+                      value={joinCode}
+                      onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                      placeholder="Ej: ABC123"
+                      maxLength={6}
+                      className="bg-dark-card/50 border-gray-600/50 text-white text-center text-lg font-mono backdrop-blur-sm focus:border-golf-green transition-all duration-300"
+                    />
+                  </div>
+                  
+                  <Button
+                    onClick={joinRoom}
+                    disabled={isLoading || !joinCode.trim() || !isConnected}
+                    className="w-full bg-gradient-to-r from-golf-green to-green-600 text-white py-3 font-semibold hover:from-golf-light hover:to-green-500 transition-all duration-300 shadow-lg"
+                  >
+                    {isLoading ? 'Conectando...' : 'Unirse'}
+                  </Button>
+                  
+                  <Button
+                    onClick={() => setMode('menu')}
+                    variant="ghost"
+                    className="w-full text-gray-400 hover:text-white transition-all duration-300"
+                  >
+                    Cancelar
+                  </Button>
+                </CardContent>
+              </Card>
+            </FloatingElement>
           </div>
         )}
 
@@ -344,26 +346,27 @@ export default function MultiplayerLobby() {
         {mode === 'room' && currentRoom && (
           <div className="space-y-4">
             {/* Room Info */}
-            <Card className="bg-dark-surface border-gray-700">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-white">Sala de Partida</CardTitle>
-                  <Badge className="bg-golf-green text-white">
-                    {currentRoom.status === 'waiting' ? 'Esperando' : 'En juego'}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-dark-card rounded-lg">
+            <FloatingElement delay={0.1} intensity="moderate">
+              <Card className="bg-dark-surface/80 backdrop-blur-md border-gray-700/50 shadow-2xl">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-white">Sala de Partida</CardTitle>
+                    <Badge className="bg-golf-green text-white">
+                      {currentRoom.status === 'waiting' ? 'Esperando' : 'En juego'}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-dark-card/80 to-dark-surface/80 backdrop-blur-md rounded-lg border border-golf-green/20">
                   <div>
-                    <p className="text-sm text-gray-400">Código de Sala</p>
-                    <p className="text-xl font-mono font-bold text-white">{currentRoom.code}</p>
+                    <p className="text-sm text-gray-400 mb-1">Código de Sala</p>
+                    <RoomCodeAnimation code={currentRoom.code} />
                   </div>
                   <Button
                     onClick={copyRoomCode}
                     size="sm"
                     variant="outline"
-                    className="border-gray-600 text-white hover:bg-dark-accent"
+                    className="border-gray-600/50 bg-dark-accent/50 text-white hover:bg-golf-green hover:border-golf-green transition-all duration-300"
                   >
                     {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   </Button>
@@ -375,13 +378,15 @@ export default function MultiplayerLobby() {
                     Jugadores ({currentRoom.players.length}/6)
                   </p>
                   <div className="space-y-2">
-                    {currentRoom.players.map((player) => (
-                      <div
-                        key={player.id}
-                        className={`flex items-center justify-between p-3 rounded-lg ${
-                          player.connected ? 'bg-dark-card' : 'bg-red-900/20'
-                        }`}
-                      >
+                    {currentRoom.players.map((player, index) => (
+                      <FloatingElement key={player.id} delay={0.2 + index * 0.1} intensity="subtle">
+                        <div
+                          className={`flex items-center justify-between p-3 rounded-lg backdrop-blur-sm border transition-all duration-300 ${
+                            player.connected 
+                              ? 'bg-dark-card/80 border-gray-600/30 shadow-lg' 
+                              : 'bg-red-900/20 border-red-500/30'
+                          }`}
+                        >
                         <div className="flex items-center space-x-3">
                           <div className="relative">
                             <div className="w-10 h-10 bg-golf-blue rounded-full flex items-center justify-center">
@@ -405,36 +410,42 @@ export default function MultiplayerLobby() {
                             <Badge variant="destructive">Desconectado</Badge>
                           )}
                         </div>
-                      </div>
+                        </div>
+                      </FloatingElement>
                     ))}
                   </div>
                 </div>
 
                 {/* Host Controls */}
                 {currentRoom.players.find(p => p.id === currentUser.id)?.isHost && (
-                  <div className="space-y-3 pt-4 border-t border-gray-700">
-                    <Button
-                      onClick={startGame}
-                      disabled={currentRoom.players.length < 2}
-                      className="w-full bg-golf-green text-white py-3 font-semibold hover:bg-golf-light"
-                    >
-                      Iniciar Partida
-                    </Button>
-                    <p className="text-xs text-gray-400 text-center">
-                      {currentRoom.players.length < 2 ? 'Necesitas al menos 2 jugadores' : 'Todos los jugadores están listos'}
-                    </p>
-                  </div>
+                  <FloatingElement delay={0.8} intensity="subtle">
+                    <div className="space-y-3 pt-4 border-t border-gray-700/50">
+                      <Button
+                        onClick={startGame}
+                        disabled={currentRoom.players.length < 2}
+                        className="w-full bg-gradient-to-r from-golf-green to-green-600 text-white py-3 font-semibold hover:from-golf-light hover:to-green-500 transition-all duration-300 shadow-lg"
+                      >
+                        Iniciar Partida
+                      </Button>
+                      <p className="text-xs text-gray-400 text-center">
+                        {currentRoom.players.length < 2 ? 'Necesitas al menos 2 jugadores' : 'Todos los jugadores están listos'}
+                      </p>
+                    </div>
+                  </FloatingElement>
                 )}
 
-                <Button
-                  onClick={leaveRoom}
-                  variant="ghost"
-                  className="w-full text-gray-400 hover:text-white"
-                >
-                  Salir de la Sala
-                </Button>
+                <FloatingElement delay={1.0} intensity="subtle">
+                  <Button
+                    onClick={leaveRoom}
+                    variant="ghost"
+                    className="w-full text-gray-400 hover:text-white transition-all duration-300"
+                  >
+                    Salir de la Sala
+                  </Button>
+                </FloatingElement>
               </CardContent>
             </Card>
+            </FloatingElement>
           </div>
         )}
       </div>
