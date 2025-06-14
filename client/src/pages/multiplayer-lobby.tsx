@@ -8,6 +8,8 @@ import { StorageManager } from '@/lib/storage';
 import { Link, useLocation } from 'wouter';
 import { Users, Plus, LogIn, Copy, Check, Wifi, WifiOff, Crown, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { InteractiveBackground } from '@/components/interactive-background';
+import { FloatingElement, LobbyAmbientEffects, ConnectionPulse, RoomCodeAnimation, PlayerJoinedAnimation } from '@/components/floating-ui-elements';
 
 interface GameRoom {
   id: string;
@@ -31,6 +33,7 @@ export default function MultiplayerLobby() {
   const [currentRoom, setCurrentRoom] = useState<GameRoom | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [recentJoinedPlayer, setRecentJoinedPlayer] = useState<string | null>(null);
   
   const { toast } = useToast();
   const { isConnected, sendMessage, lastMessage } = useWebSocket('/ws');
@@ -58,6 +61,8 @@ export default function MultiplayerLobby() {
         break;
       
       case 'player_joined':
+        setRecentJoinedPlayer(message.player.name);
+        setTimeout(() => setRecentJoinedPlayer(null), 3000);
         toast({
           title: "Jugador unido",
           description: `${message.player.name} se unió a la partida`,
@@ -229,62 +234,68 @@ export default function MultiplayerLobby() {
   if (!currentUser) return null;
 
   return (
-    <div className="min-h-screen bg-dark-bg p-4">
-      <div className="max-w-md mx-auto space-y-6">
+    <div className="min-h-screen bg-dark-bg p-4 relative overflow-hidden">
+      {/* Interactive Background Effects */}
+      <InteractiveBackground 
+        intensity={mode === 'room' ? 'high' : 'medium'} 
+        theme="golf" 
+      />
+      <LobbyAmbientEffects />
+      <ConnectionPulse isConnected={isConnected} />
+      
+      {/* Player Join Animation */}
+      {recentJoinedPlayer && (
+        <PlayerJoinedAnimation playerName={recentJoinedPlayer} />
+      )}
+      
+      <div className="max-w-md mx-auto space-y-6 relative z-20">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="flex items-center justify-center space-x-2">
-            <Users className="h-8 w-8 text-golf-green" />
-            <h1 className="text-2xl font-bold text-white">Multijugador</h1>
+        <FloatingElement delay={0} intensity="subtle">
+          <div className="text-center space-y-2">
+            <div className="flex items-center justify-center space-x-2">
+              <Users className="h-8 w-8 text-golf-green" />
+              <h1 className="text-2xl font-bold text-white">Multijugador</h1>
+            </div>
           </div>
-          <div className="flex items-center justify-center space-x-2">
-            {isConnected ? (
-              <>
-                <Wifi className="h-4 w-4 text-green-400" />
-                <span className="text-sm text-green-400">Conectado</span>
-              </>
-            ) : (
-              <>
-                <WifiOff className="h-4 w-4 text-red-400" />
-                <span className="text-sm text-red-400">Desconectado</span>
-              </>
-            )}
-          </div>
-        </div>
+        </FloatingElement>
 
         {/* Main Menu */}
         {mode === 'menu' && (
           <div className="space-y-4">
-            <Card className="bg-dark-surface border-gray-700">
-              <CardContent className="p-6 space-y-4">
-                <Button
-                  onClick={createRoom}
-                  disabled={isLoading || !isConnected}
-                  className="w-full bg-golf-green text-white py-4 text-lg font-semibold hover:bg-golf-light"
-                >
-                  <Plus className="h-5 w-5 mr-2" />
-                  Crear Partida
-                </Button>
-                
-                <Button
-                  onClick={() => setMode('join')}
-                  disabled={!isConnected}
-                  variant="outline"
-                  className="w-full border-gray-600 text-white py-4 text-lg font-semibold hover:bg-dark-accent"
-                >
-                  <LogIn className="h-5 w-5 mr-2" />
-                  Unirse con Código
-                </Button>
-              </CardContent>
-            </Card>
+            <FloatingElement delay={0.2} intensity="moderate">
+              <Card className="bg-dark-surface/80 backdrop-blur-md border-gray-700/50 shadow-2xl">
+                <CardContent className="p-6 space-y-4">
+                  <Button
+                    onClick={createRoom}
+                    disabled={isLoading || !isConnected}
+                    className="w-full bg-gradient-to-r from-golf-green to-green-600 text-white py-4 text-lg font-semibold hover:from-golf-light hover:to-green-500 transition-all duration-300 shadow-lg"
+                  >
+                    <Plus className="h-5 w-5 mr-2" />
+                    {isLoading ? 'Creando...' : 'Crear Partida'}
+                  </Button>
+                  
+                  <Button
+                    onClick={() => setMode('join')}
+                    disabled={!isConnected}
+                    variant="outline"
+                    className="w-full border-gray-600/50 bg-dark-accent/50 text-white py-4 text-lg font-semibold hover:bg-dark-accent hover:border-golf-green transition-all duration-300"
+                  >
+                    <LogIn className="h-5 w-5 mr-2" />
+                    Unirse con Código
+                  </Button>
+                </CardContent>
+              </Card>
+            </FloatingElement>
 
-            <div className="text-center">
-              <Link href="/dashboard">
-                <Button variant="ghost" className="text-gray-400 hover:text-white">
-                  ← Volver al Dashboard
-                </Button>
-              </Link>
-            </div>
+            <FloatingElement delay={0.4} intensity="subtle">
+              <div className="text-center">
+                <Link href="/dashboard">
+                  <Button variant="ghost" className="text-gray-400 hover:text-white transition-all duration-300">
+                    ← Volver al Dashboard
+                  </Button>
+                </Link>
+              </div>
+            </FloatingElement>
           </div>
         )}
 
