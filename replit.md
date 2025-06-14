@@ -29,6 +29,16 @@ Mobile-optimized web application for golf scoring and betting calculations speci
 
 ## Recent Changes
 **June 14, 2025**
+- **GHIN HANDICAP INTEGRATION**: Official USGA handicap verification system implemented:
+  - GHIN number field added to user registration with automatic verification
+  - Real-time handicap validation against official USGA GHIN database
+  - Prevents handicap fraud by verifying against official records
+  - API endpoints for handicap verification, player search, and automatic updates
+  - Database schema updated with handicap verification status tracking
+  - Registration form includes optional GHIN number with validation
+  - System falls back to local verification when GHIN API unavailable
+  - Ready for production with GHIN API credentials (GHIN_API_KEY, GHIN_CLIENT_ID, GHIN_CLIENT_SECRET)
+
 - **SUBSCRIPTION SYSTEM**: Comprehensive freemium business model implemented:
   - **Free Plan (Basic Golf)**: 3 rondas/mes, 4 jugadores, 1 campo, betting básico
   - **Premium Plan (Pro Golfer)**: $4.99/mes, rondas ilimitadas, 6 jugadores, todos los campos

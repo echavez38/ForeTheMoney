@@ -172,6 +172,17 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  async updateHandicap(userId: number, handicap: number): Promise<void> {
+    await db
+      .update(users)
+      .set({
+        handicap: handicap,
+        handicapVerified: true,
+        handicapLastVerified: new Date()
+      })
+      .where(eq(users.id, userId));
+  }
+
   async createRound(insertRound: InsertRound): Promise<Round> {
     const [round] = await db
       .insert(rounds)

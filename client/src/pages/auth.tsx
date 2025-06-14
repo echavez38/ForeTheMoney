@@ -18,6 +18,7 @@ interface RegisterFormData {
   username: string;
   name: string;
   handicap: number;
+  ghinNumber: string;
   authType: 'pin' | 'password';
   pin: string;
   password: string;
@@ -41,6 +42,7 @@ export default function Auth() {
     username: '',
     name: '',
     handicap: 18,
+    ghinNumber: '',
     authType: 'pin',
     pin: '',
     password: ''
@@ -403,6 +405,24 @@ export default function Auth() {
                         onChange={(e) => setRegisterForm({...registerForm, handicap: parseInt(e.target.value) || 18})}
                         className="bg-dark-card border-gray-600 text-white"
                       />
+                    </div>
+
+                    {/* GHIN Number */}
+                    <div>
+                      <Label className="text-white">Número GHIN (Opcional)</Label>
+                      <div className="relative">
+                        <Shield className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input
+                          value={registerForm.ghinNumber}
+                          onChange={(e) => setRegisterForm({...registerForm, ghinNumber: e.target.value.replace(/\D/g, '').slice(0, 8)})}
+                          placeholder="12345678"
+                          maxLength={8}
+                          className="bg-dark-card border-gray-600 text-white pl-10"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Para verificar handicap oficial con USGA GHIN
+                      </p>
                     </div>
 
                     {/* Auth Type Selection */}
