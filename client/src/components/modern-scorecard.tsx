@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { RoundPlayer, HoleInfo, TeeSelection } from '@/lib/types';
 import { ChevronLeft, ChevronRight, RotateCw, Target, TrendingUp, CreditCard, X } from 'lucide-react';
+import { ScoreEntryModal } from './score-entry-modal';
 
 interface ModernScorecardProps {
   players: RoundPlayer[];
@@ -40,6 +41,8 @@ export function ModernScorecard({
   bettingOptions
 }: ModernScorecardProps) {
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
+  const [scoreModalOpen, setScoreModalOpen] = useState(false);
+  const [activePlayer, setActivePlayer] = useState<RoundPlayer | null>(null);
   
   // Get current oyeses winner for this hole
   const currentOyesesWinner = players.find(player => {
@@ -268,7 +271,10 @@ export function ModernScorecard({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setSelectedPlayer(isSelected ? null : player.id)}
+                    onClick={() => {
+                      setActivePlayer(player);
+                      setScoreModalOpen(true);
+                    }}
                     className="bg-dark-accent border-gray-600 text-golf-blue hover:bg-golf-blue hover:text-white"
                   >
                     {currentScore ? 'Editar' : 'Añadir'}
@@ -277,25 +283,18 @@ export function ModernScorecard({
 
                 {isSelected && (
                   <div className="mt-4 pt-4 border-t border-gray-700">
-                    <p className="text-sm text-secondary mb-3">Puntuación para el hoyo {currentHole}</p>
-                    <div className="grid grid-cols-6 gap-2">
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => (
-                        <Button
-                          key={score}
-                          onClick={() => {
-                            onScoreChange(player.id, score);
-                            setSelectedPlayer(null);
-                          }}
-                          className={`aspect-square text-sm font-semibold ${
-                            currentScore?.grossScore === score
-                              ? 'bg-golf-blue text-white'
-                              : 'bg-dark-accent text-white hover:bg-golf-blue hover:text-white'
-                          }`}
-                        >
-                          {score === 10 ? '10+' : score}
-                        </Button>
-                      ))}
-                    </div>
+                    <ModernScoreInput
+                      selectedScore={currentScore?.grossScore || null}
+                      onScoreSelect={(score) => {
+                        onScoreChange(player.id, score);
+                        setSelectedPlayer(null);
+                      }}
+                      par={holeInfo.par}
+                      playerName={player.name}
+                      handicap={player.handicap}
+                      strokeIndex={holeInfo.strokeIndex[player.selectedTee.color]}
+                      maxScore={10}
+                    />
                   </div>
                 )}
               </CardContent>
