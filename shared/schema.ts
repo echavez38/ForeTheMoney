@@ -1,14 +1,21 @@
-import { pgTable, text, serial, integer, boolean, timestamp, real, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, real, jsonb, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  username: varchar("username", { length: 50 }).notNull().unique(),
   name: text("name").notNull(),
-  pin: text("pin").notNull(),
   handicap: integer("handicap").notNull().default(18),
+  pin: varchar("pin", { length: 6 }),
+  password: text("password"),
+  authType: varchar("auth_type", { length: 10 }).notNull().default("pin"), // "pin" or "password"
+  isActive: boolean("is_active").notNull().default(true),
+  lastLogin: timestamp("last_login"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const rounds = pgTable("rounds", {
@@ -63,9 +70,46 @@ export const scoresRelations = relations(scores, ({ one }) => ({
 }));
 
 export const insertUserSchema = createInsertSchema(users).pick({
+  email: true,
+  username: true,
   name: true,
-  pin: true,
   handicap: true,
+  pin: true,
+  password: true,
+  authType: true,
+});
+
+// Schemas de validación para registro y login
+export const registerUserSchema = z.object({
+  email: z.string().email("Email válido requerido"),
+  username: z.string()
+    .min(3, "Username debe tener al menos 3 caracteres")
+    .max(20, "Username no puede exceder 20 caracteres")
+    .regex(/^[a-zA-Z0-9_]+$/, "Username solo puede contener letras, números y guiones bajos"),
+  name: z.string().min(2, "Nombre debe tener al menos 2 caracteres"),
+  handicap: z.number().min(0).max(54).default(18),
+  authType: z.enum(["pin", "password"]),
+  pin: z.string().length(6, "PIN debe tener exactamente 6 dígitos").regex(/^\d+$/, "PIN solo puede contener números").optional(),
+  password: z.string()
+    .min(8, "Contraseña debe tener al menos 8 caracteres")
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, 
+      "Contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial")
+    .optional(),
+}).refine((data) => {
+  if (data.authType === "pin" && !data.pin) {
+    return false;
+  }
+  if (data.authType === "password" && !data.password) {
+    return false;
+  }
+  return true;
+}, {
+  message: "PIN o contraseña requerido según el tipo de autenticación seleccionado",
+});
+
+export const loginUserSchema = z.object({
+  identifier: z.string().min(1, "Email o username requerido"), // email o username
+  credential: z.string().min(1, "PIN o contraseña requerido"), // pin o password
 });
 
 export const insertRoundSchema = createInsertSchema(rounds).pick({
@@ -93,6 +137,8 @@ export const insertScoreSchema = createInsertSchema(scores).pick({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+export type RegisterUser = z.infer<typeof registerUserSchema>;
+export type LoginUser = z.infer<typeof loginUserSchema>;
 export type InsertRound = z.infer<typeof insertRoundSchema>;
 export type Round = typeof rounds.$inferSelect;
 export type InsertPlayer = z.infer<typeof insertPlayerSchema>;

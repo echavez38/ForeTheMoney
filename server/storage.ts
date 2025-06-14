@@ -1,12 +1,19 @@
-import { users, rounds, players, scores, type User, type InsertUser, type Round, type Player, type Score, type InsertRound, type InsertPlayer, type InsertScore } from "@shared/schema";
+import { users, rounds, players, scores, type User, type InsertUser, type RegisterUser, type LoginUser, type Round, type Player, type Score, type InsertRound, type InsertPlayer, type InsertScore } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, or } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 
 export interface IStorage {
   // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByPin(pin: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByIdentifier(identifier: string): Promise<User | undefined>; // email o username
   createUser(user: InsertUser): Promise<User>;
+  registerUser(userData: RegisterUser): Promise<User>;
+  authenticateUser(loginData: LoginUser): Promise<User | null>;
+  updateLastLogin(userId: number): Promise<void>;
   
   // Round operations
   createRound(round: InsertRound): Promise<Round>;
