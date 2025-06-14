@@ -29,6 +29,17 @@ Mobile-optimized web application for golf scoring and betting calculations speci
 
 ## Recent Changes
 **June 14, 2025**
+- **SUBSCRIPTION SYSTEM**: Comprehensive freemium business model implemented:
+  - **Free Plan (Basic Golf)**: 3 rondas/mes, 4 jugadores, 1 campo, betting básico
+  - **Premium Plan (Pro Golfer)**: $4.99/mes, rondas ilimitadas, 6 jugadores, todos los campos
+  - Database schema updated with subscription fields and round tracking
+  - Real-time subscription validation and limit enforcement
+  - Professional subscription management page with upgrade functionality
+  - Dashboard integration with Premium button and status indicators
+  - API endpoints for subscription info, pricing, and upgrades
+  - Monthly round counter with automatic reset functionality
+  - Ready for payment processor integration (Stripe/PayPal)
+
 - **EMAIL WELCOME SYSTEM**: Implemented automatic welcome emails for new registrations:
   - Professional HTML email template with golf theme and brand styling
   - Includes user account information, feature overview, and getting started tips
