@@ -44,11 +44,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      const user = await storage.registerUser({
-        ...userData,
-        handicapVerified,
-        handicapLastVerified: handicapVerified ? new Date() : null
-      });
+      const user = await storage.registerUser(userData);
       
       // Send welcome email asynchronously (don't wait for it)
       emailService.sendWelcomeEmail(user).catch(error => {

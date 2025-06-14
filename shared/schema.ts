@@ -96,26 +96,58 @@ export const registerUserSchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/, "Username solo puede contener letras, números y guiones bajos"),
   name: z.string().min(2, "Nombre debe tener al menos 2 caracteres"),
   handicap: z.number().min(0).max(54).default(18),
-  ghinNumber: z.string()
-    .regex(/^\d{7,8}$/, "Número GHIN debe tener 7-8 dígitos")
-    .optional(),
+  ghinNumber: z.string().optional().transform(val => !val || val === "" ? undefined : val),
   authType: z.enum(["pin", "password"]),
-  pin: z.string().length(6, "PIN debe tener exactamente 6 dígitos").regex(/^\d+$/, "PIN solo puede contener números").optional(),
-  password: z.string()
-    .min(8, "Contraseña debe tener al menos 8 caracteres")
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, 
-      "Contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial")
-    .optional(),
-}).refine((data) => {
-  if (data.authType === "pin" && !data.pin) {
-    return false;
+  pin: z.string().optional().transform(val => !val || val === "" ? undefined : val),
+  password: z.string().optional().transform(val => !val || val === "" ? undefined : val),
+}).superRefine((data, ctx) => {
+  // Validate authentication method
+  if (data.authType === "pin") {
+    if (!data.pin) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "PIN es requerido cuando seleccionas autenticación por PIN",
+        path: ["pin"]
+      });
+    } else if (data.pin.length !== 6) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "PIN debe tener exactamente 6 dígitos",
+        path: ["pin"]
+      });
+    } else if (!/^\d+$/.test(data.pin)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "PIN solo puede contener números",
+        path: ["pin"]
+      });
+    }
   }
-  if (data.authType === "password" && !data.password) {
-    return false;
+  
+  if (data.authType === "password") {
+    if (!data.password) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Contraseña es requerida cuando seleccionas autenticación por contraseña",
+        path: ["password"]
+      });
+    } else if (data.password.length < 8) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Contraseña debe tener al menos 8 caracteres",
+        path: ["password"]
+      });
+    }
   }
-  return true;
-}, {
-  message: "PIN o contraseña requerido según el tipo de autenticación seleccionado",
+  
+  // Validate GHIN number if provided
+  if (data.ghinNumber && !/^\d{7,8}$/.test(data.ghinNumber)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Número GHIN debe tener 7-8 dígitos",
+      path: ["ghinNumber"]
+    });
+  }
 });
 
 export const loginUserSchema = z.object({
