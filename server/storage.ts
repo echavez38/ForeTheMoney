@@ -123,6 +123,48 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, userId));
   }
 
+  async updateSubscription(userId: number, subscriptionData: {
+    subscriptionType: string;
+    subscriptionStartDate: Date;
+    subscriptionEndDate: Date;
+  }): Promise<void> {
+    await db
+      .update(users)
+      .set({
+        subscriptionType: subscriptionData.subscriptionType,
+        subscriptionStartDate: subscriptionData.subscriptionStartDate,
+        subscriptionEndDate: subscriptionData.subscriptionEndDate
+      })
+      .where(eq(users.id, userId));
+  }
+
+  async incrementRoundCount(userId: number): Promise<void> {
+    const user = await this.getUser(userId);
+    if (!user) return;
+
+    const now = new Date();
+    const lastReset = user.lastMonthReset || user.createdAt || now;
+    const daysSinceReset = Math.floor((now.getTime() - lastReset.getTime()) / (1000 * 60 * 60 * 24));
+
+    // Reset counter if it's been more than 30 days
+    if (daysSinceReset >= 30) {
+      await db
+        .update(users)
+        .set({
+          roundsThisMonth: 1,
+          lastMonthReset: now
+        })
+        .where(eq(users.id, userId));
+    } else {
+      await db
+        .update(users)
+        .set({
+          roundsThisMonth: user.roundsThisMonth + 1
+        })
+        .where(eq(users.id, userId));
+    }
+  }
+
   async createRound(insertRound: InsertRound): Promise<Round> {
     const [round] = await db
       .insert(rounds)

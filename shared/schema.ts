@@ -13,6 +13,11 @@ export const users = pgTable("users", {
   password: text("password"),
   authType: varchar("auth_type", { length: 10 }).notNull().default("pin"), // "pin" or "password"
   isActive: boolean("is_active").notNull().default(true),
+  subscriptionType: varchar("subscription_type", { length: 20 }).notNull().default("free"), // "free" or "premium"
+  subscriptionStartDate: timestamp("subscription_start_date"),
+  subscriptionEndDate: timestamp("subscription_end_date"),
+  roundsThisMonth: integer("rounds_this_month").notNull().default(0),
+  lastMonthReset: timestamp("last_month_reset").defaultNow(),
   lastLogin: timestamp("last_login"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

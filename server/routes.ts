@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { emailService } from "./email";
+import { SubscriptionService } from "./subscription";
 import { insertUserSchema, insertRoundSchema, insertPlayerSchema, insertScoreSchema, registerUserSchema, loginUserSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -86,6 +87,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ available: !user });
     } catch (error) {
       console.error(`Error checking username: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Subscription routes
+  app.get("/api/subscription/info/:userId", async (req, res) => {
+    try {
+      const user = await storage.getUser(parseInt(req.params.userId));
+      if (!user) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+      
+      const subscriptionInfo = SubscriptionService.getSubscriptionInfo(user);
+      res.json(subscriptionInfo);
+    } catch (error) {
+      console.error(`Error getting subscription info: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.get("/api/subscription/pricing", async (req, res) => {
+    try {
+      const pricing = SubscriptionService.getPricingInfo();
+      res.json(pricing);
+    } catch (error) {
+      console.error(`Error getting pricing info: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.post("/api/subscription/upgrade/:userId", async (req, res) => {
+    try {
+      const user = await storage.getUser(parseInt(req.params.userId));
+      if (!user) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+
+      // In a real app, you'd integrate with Stripe/PayPal here
+      // For demo purposes, we'll simulate the upgrade
+      const subscriptionEndDate = new Date();
+      subscriptionEndDate.setMonth(subscriptionEndDate.getMonth() + 1);
+
+      await storage.updateSubscription(user.id, {
+        subscriptionType: 'premium',
+        subscriptionStartDate: new Date(),
+        subscriptionEndDate: subscriptionEndDate
+      });
+
+      const updatedUser = await storage.getUser(user.id);
+      const subscriptionInfo = SubscriptionService.getSubscriptionInfo(updatedUser!);
+      
+      res.json({ 
+        success: true, 
+        message: "Suscripción actualizada exitosamente",
+        subscription: subscriptionInfo 
+      });
+    } catch (error) {
+      console.error(`Error upgrading subscription: ${error}`);
       res.status(500).json({ error: "Error interno del servidor" });
     }
   });
