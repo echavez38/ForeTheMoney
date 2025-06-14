@@ -148,7 +148,7 @@ export default function Auth() {
 
         toast({
           title: "Registro exitoso",
-          description: "Tu cuenta ha sido creada correctamente",
+          description: "Tu cuenta ha sido creada correctamente. Te hemos enviado un email de bienvenida con toda la información.",
         });
 
         navigate('/dashboard');
@@ -516,6 +516,15 @@ export default function Auth() {
                         </div>
                       </div>
                     )}
+
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
+                      <div className="flex items-center space-x-2">
+                        <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        <p className="text-sm text-blue-800 dark:text-blue-200">
+                          Al registrarte, recibirás un email de bienvenida con información detallada de la app.
+                        </p>
+                      </div>
+                    </div>
 
                     <Button
                       type="submit"

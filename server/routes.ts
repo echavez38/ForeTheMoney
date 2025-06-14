@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
+import { emailService } from "./email";
 import { insertUserSchema, insertRoundSchema, insertPlayerSchema, insertScoreSchema, registerUserSchema, loginUserSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -23,6 +24,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const user = await storage.registerUser(userData);
+      
+      // Send welcome email asynchronously (don't wait for it)
+      emailService.sendWelcomeEmail(user).catch(error => {
+        console.error('Error enviando email de bienvenida:', error);
+      });
       
       // Don't return sensitive data
       const { password, ...userResponse } = user;
