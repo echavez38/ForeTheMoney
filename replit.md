@@ -28,6 +28,16 @@ Mobile-optimized web application for golf scoring and betting calculations speci
 - Proper handicap indexing for each hole
 
 ## Recent Changes
+**June 14, 2025**
+- **EMAIL WELCOME SYSTEM**: Implemented automatic welcome emails for new registrations:
+  - Professional HTML email template with golf theme and brand styling
+  - Includes user account information, feature overview, and getting started tips
+  - Automatic sending after successful registration using Nodemailer
+  - Development mode uses Ethereal Email test accounts with preview URLs
+  - Production ready for Gmail/SMTP configuration with environment variables
+  - Visual notification in registration form about welcome email
+  - Enhanced user onboarding experience with comprehensive app introduction
+
 **June 13, 2025**
 - Updated Club Campestre de Puebla hole data with authentic yardages and layout
 - Removed all other golf course options - only Club Campestre de Puebla available
