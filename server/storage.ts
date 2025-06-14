@@ -20,6 +20,7 @@ export interface IStorage {
     subscriptionEndDate: Date;
   }): Promise<void>;
   incrementRoundCount(userId: number): Promise<void>;
+  updateHandicap(userId: number, handicap: number): Promise<void>;
   
   // Round operations
   createRound(round: InsertRound): Promise<Round>;

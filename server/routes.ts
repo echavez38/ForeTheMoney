@@ -4,6 +4,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { emailService } from "./email";
 import { SubscriptionService } from "./subscription";
+import { ghinService } from "./ghin";
 import { insertUserSchema, insertRoundSchema, insertPlayerSchema, insertScoreSchema, registerUserSchema, loginUserSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -24,7 +25,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "El username ya está en uso" });
       }
 
-      const user = await storage.registerUser(userData);
+      // Verify handicap with GHIN if number is provided
+      let handicapVerified = false;
+      if (userData.ghinNumber) {
+        try {
+          const verification = await ghinService.verifyHandicap(userData.ghinNumber, userData.handicap);
+          handicapVerified = verification.isValid;
+          
+          if (!verification.isValid && verification.requiresUpdate) {
+            return res.status(400).json({ 
+              error: verification.errorMessage,
+              suggestedHandicap: verification.officialHandicap 
+            });
+          }
+        } catch (error) {
+          console.error('Error verificando handicap GHIN:', error);
+          // Continue with registration but mark as unverified
+        }
+      }
+
+      const user = await storage.registerUser({
+        ...userData,
+        handicapVerified,
+        handicapLastVerified: handicapVerified ? new Date() : null
+      });
       
       // Send welcome email asynchronously (don't wait for it)
       emailService.sendWelcomeEmail(user).catch(error => {
@@ -33,7 +57,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Don't return sensitive data
       const { password, ...userResponse } = user;
-      res.status(201).json(userResponse);
+      res.status(201).json({
+        ...userResponse,
+        handicapStatus: handicapVerified ? 'verified' : 'pending'
+      });
     } catch (error: any) {
       console.error(`Error registering user: ${error}`);
       if (error.name === 'ZodError') {
@@ -145,6 +172,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error(`Error upgrading subscription: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // GHIN verification routes
+  app.post("/api/ghin/verify", async (req, res) => {
+    try {
+      const { ghinNumber, handicap } = req.body;
+      
+      if (!ghinNumber || !handicap) {
+        return res.status(400).json({ error: "GHIN number y handicap requeridos" });
+      }
+
+      const verification = await ghinService.verifyHandicap(ghinNumber, handicap);
+      res.json(verification);
+    } catch (error) {
+      console.error(`Error verifying GHIN: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.get("/api/ghin/search", async (req, res) => {
+    try {
+      const { firstName, lastName } = req.query;
+      
+      if (!firstName || !lastName) {
+        return res.status(400).json({ error: "Nombre y apellido requeridos" });
+      }
+
+      const players = await ghinService.searchPlayer(firstName as string, lastName as string);
+      res.json(players);
+    } catch (error) {
+      console.error(`Error searching GHIN players: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.get("/api/ghin/status", async (req, res) => {
+    try {
+      const status = ghinService.getVerificationStatus();
+      res.json(status);
+    } catch (error) {
+      console.error(`Error getting GHIN status: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.post("/api/ghin/update-handicap/:userId", async (req, res) => {
+    try {
+      const user = await storage.getUser(parseInt(req.params.userId));
+      if (!user || !user.ghinNumber) {
+        return res.status(404).json({ error: "Usuario no encontrado o sin número GHIN" });
+      }
+
+      const newHandicap = await ghinService.updateHandicapFromGHIN(user.ghinNumber);
+      if (newHandicap === null) {
+        return res.status(404).json({ error: "No se pudo obtener handicap actualizado de GHIN" });
+      }
+
+      await storage.updateHandicap(user.id, newHandicap);
+      
+      res.json({ 
+        success: true, 
+        newHandicap,
+        message: "Handicap actualizado desde GHIN"
+      });
+    } catch (error) {
+      console.error(`Error updating handicap from GHIN: ${error}`);
       res.status(500).json({ error: "Error interno del servidor" });
     }
   });

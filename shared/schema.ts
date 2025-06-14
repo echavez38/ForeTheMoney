@@ -9,6 +9,9 @@ export const users = pgTable("users", {
   username: varchar("username", { length: 50 }).notNull().unique(),
   name: text("name").notNull(),
   handicap: integer("handicap").notNull().default(18),
+  ghinNumber: varchar("ghin_number", { length: 20 }),
+  handicapVerified: boolean("handicap_verified").notNull().default(false),
+  handicapLastVerified: timestamp("handicap_last_verified"),
   pin: varchar("pin", { length: 6 }),
   password: text("password"),
   authType: varchar("auth_type", { length: 10 }).notNull().default("pin"), // "pin" or "password"
@@ -93,6 +96,9 @@ export const registerUserSchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/, "Username solo puede contener letras, números y guiones bajos"),
   name: z.string().min(2, "Nombre debe tener al menos 2 caracteres"),
   handicap: z.number().min(0).max(54).default(18),
+  ghinNumber: z.string()
+    .regex(/^\d{7,8}$/, "Número GHIN debe tener 7-8 dígitos")
+    .optional(),
   authType: z.enum(["pin", "password"]),
   pin: z.string().length(6, "PIN debe tener exactamente 6 dígitos").regex(/^\d+$/, "PIN solo puede contener números").optional(),
   password: z.string()
