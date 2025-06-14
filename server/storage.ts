@@ -43,12 +43,84 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async getUserByIdentifier(identifier: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(
+      or(eq(users.email, identifier), eq(users.username, identifier))
+    );
+    return user || undefined;
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
       .values(insertUser)
       .returning();
     return user;
+  }
+
+  async registerUser(userData: RegisterUser): Promise<User> {
+    // Hash password if provided
+    let hashedPassword = null;
+    if (userData.password) {
+      const saltRounds = 12;
+      hashedPassword = await bcrypt.hash(userData.password, saltRounds);
+    }
+
+    const [user] = await db
+      .insert(users)
+      .values({
+        email: userData.email,
+        username: userData.username,
+        name: userData.name,
+        handicap: userData.handicap,
+        pin: userData.pin || null,
+        password: hashedPassword,
+        authType: userData.authType,
+        isActive: true,
+      })
+      .returning();
+    
+    return user;
+  }
+
+  async authenticateUser(loginData: LoginUser): Promise<User | null> {
+    const user = await this.getUserByIdentifier(loginData.identifier);
+    if (!user || !user.isActive) {
+      return null;
+    }
+
+    // Verify credentials based on auth type
+    if (user.authType === 'pin' && user.pin) {
+      if (loginData.credential === user.pin) {
+        await this.updateLastLogin(user.id);
+        return user;
+      }
+    } else if (user.authType === 'password' && user.password) {
+      const isValidPassword = await bcrypt.compare(loginData.credential, user.password);
+      if (isValidPassword) {
+        await this.updateLastLogin(user.id);
+        return user;
+      }
+    }
+
+    return null;
+  }
+
+  async updateLastLogin(userId: number): Promise<void> {
+    await db
+      .update(users)
+      .set({ lastLogin: new Date() })
+      .where(eq(users.id, userId));
   }
 
   async createRound(insertRound: InsertRound): Promise<Round> {

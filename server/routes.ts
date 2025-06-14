@@ -2,10 +2,89 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
-import { insertUserSchema, insertRoundSchema, insertPlayerSchema, insertScoreSchema } from "@shared/schema";
+import { insertUserSchema, insertRoundSchema, insertPlayerSchema, insertScoreSchema, registerUserSchema, loginUserSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // User routes
+  // Authentication routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const userData = registerUserSchema.parse(req.body);
+      
+      // Check if email already exists
+      const existingEmail = await storage.getUserByEmail(userData.email);
+      if (existingEmail) {
+        return res.status(400).json({ error: "El email ya está registrado" });
+      }
+
+      // Check if username already exists
+      const existingUsername = await storage.getUserByUsername(userData.username);
+      if (existingUsername) {
+        return res.status(400).json({ error: "El username ya está en uso" });
+      }
+
+      const user = await storage.registerUser(userData);
+      
+      // Don't return sensitive data
+      const { password, ...userResponse } = user;
+      res.status(201).json(userResponse);
+    } catch (error: any) {
+      console.error(`Error registering user: ${error}`);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: "Datos de registro inválidos", 
+          details: error.errors 
+        });
+      }
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const loginData = loginUserSchema.parse(req.body);
+      const user = await storage.authenticateUser(loginData);
+      
+      if (!user) {
+        return res.status(401).json({ error: "Credenciales inválidas" });
+      }
+
+      // Don't return sensitive data
+      const { password, ...userResponse } = user;
+      res.json(userResponse);
+    } catch (error: any) {
+      console.error(`Error logging in user: ${error}`);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: "Datos de login inválidos", 
+          details: error.errors 
+        });
+      }
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Check availability endpoints
+  app.get("/api/auth/check-email/:email", async (req, res) => {
+    try {
+      const user = await storage.getUserByEmail(req.params.email);
+      res.json({ available: !user });
+    } catch (error) {
+      console.error(`Error checking email: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.get("/api/auth/check-username/:username", async (req, res) => {
+    try {
+      const user = await storage.getUserByUsername(req.params.username);
+      res.json({ available: !user });
+    } catch (error) {
+      console.error(`Error checking username: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Legacy user routes (for backward compatibility)
   app.post("/api/users", async (req, res) => {
     try {
       const userData = insertUserSchema.parse(req.body);
