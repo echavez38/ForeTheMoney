@@ -6,7 +6,7 @@ import { storage } from "./storage";
 import { emailService } from "./email";
 import { SubscriptionService } from "./subscription";
 import { ghinService } from "./ghin";
-import { insertUserSchema, insertRoundSchema, insertPlayerSchema, insertScoreSchema, registerUserSchema, loginUserSchema, updateUserPreferencesSchema } from "@shared/schema";
+import { insertUserSchema, insertRoundSchema, insertPlayerSchema, insertScoreSchema, registerUserSchema, loginUserSchema, updateUserPreferencesSchema, insertSocialPostSchema, insertSocialCommentSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes

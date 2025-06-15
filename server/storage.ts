@@ -1,4 +1,4 @@
-import { users, rounds, players, scores, userPreferences, type User, type InsertUser, type RegisterUser, type LoginUser, type Round, type Player, type Score, type InsertRound, type InsertPlayer, type InsertScore, type UserPreferences, type InsertUserPreferences, type UpdateUserPreferences } from "@shared/schema";
+import { users, rounds, players, scores, userPreferences, socialPosts, socialPostLikes, socialPostComments, type User, type InsertUser, type RegisterUser, type LoginUser, type Round, type Player, type Score, type InsertRound, type InsertPlayer, type InsertScore, type UserPreferences, type InsertUserPreferences, type UpdateUserPreferences, type SocialPost, type InsertSocialPost, type SocialComment, type InsertSocialComment } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -45,6 +45,13 @@ export interface IStorage {
   createScore(score: InsertScore): Promise<Score>;
   getScoresByPlayer(playerId: number): Promise<Score[]>;
   updateScore(id: number, updates: Partial<Score>): Promise<Score | undefined>;
+  
+  // Social operations
+  getSocialFeed(userId?: number, limit?: number, offset?: number): Promise<any[]>;
+  createSocialPost(post: Partial<InsertSocialPost>): Promise<SocialPost>;
+  likeSocialPost(postId: number, userId: number): Promise<void>;
+  unlikeSocialPost(postId: number, userId: number): Promise<void>;
+  addSocialComment(postId: number, userId: number, content: string): Promise<SocialComment>;
 }
 
 export class DatabaseStorage implements IStorage {

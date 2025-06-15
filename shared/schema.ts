@@ -332,18 +332,23 @@ export const friendshipsRelations = relations(friendships, ({ one }) => ({
 }));
 
 // Social schemas
-export const insertSocialPostSchema = createInsertSchema(socialPosts).omit({
-  id: true,
-  likes: true,
-  commentsCount: true,
-  createdAt: true,
-  updatedAt: true,
+export const insertSocialPostSchema = createInsertSchema(socialPosts).pick({
+  userId: true,
+  content: true,
+  courseId: true,
+  courseName: true,
+  roundDate: true,
+  totalScore: true,
+  par: true,
+  highlights: true,
+  imageUrl: true,
+  visibility: true,
 });
 
-export const insertSocialCommentSchema = createInsertSchema(socialPostComments).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
+export const insertSocialCommentSchema = createInsertSchema(socialPostComments).pick({
+  postId: true,
+  userId: true,
+  content: true,
 });
 
 export type InsertSocialPost = z.infer<typeof insertSocialPostSchema>;
