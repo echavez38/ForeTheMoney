@@ -14,6 +14,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { StorageManager } from '@/lib/storage';
+import { PreferencesManager, type UserPreferences as PrefsType } from '@/lib/preferences';
 import { 
   User, Mail, Shield, Bell, CreditCard, Database, 
   Palette, Globe, ArrowLeft, Save, Crown, Trash2,
@@ -42,6 +43,19 @@ interface UserPreferences {
   theme: 'dark' | 'light' | 'system';
   language: 'es' | 'en';
   fontSize: 'small' | 'medium' | 'large';
+  roundReminders: boolean;
+  handicapUpdates: boolean;
+  friendInvites: boolean;
+  achievements: boolean;
+  weeklyReports: boolean;
+  socialActivity: boolean;
+  betResults: boolean;
+  courseConditions: boolean;
+  sound: boolean;
+  vibration: boolean;
+  quietHoursEnabled: boolean;
+  quietHoursStart: string;
+  quietHoursEnd: string;
 }
 
 interface SubscriptionInfo {
@@ -73,7 +87,20 @@ export default function SettingsPage() {
     emailNotifications: true,
     theme: 'dark',
     language: 'es',
-    fontSize: 'medium'
+    fontSize: 'medium',
+    roundReminders: true,
+    handicapUpdates: true,
+    friendInvites: true,
+    achievements: true,
+    weeklyReports: false,
+    socialActivity: true,
+    betResults: true,
+    courseConditions: false,
+    sound: true,
+    vibration: true,
+    quietHoursEnabled: false,
+    quietHoursStart: '22:00',
+    quietHoursEnd: '08:00'
   });
   const [showPassword, setShowPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
@@ -109,8 +136,12 @@ export default function SettingsPage() {
   }, [userProfile]);
 
   useEffect(() => {
-    if (userPreferences && Object.keys(userPreferences).length > 0) {
-      setPreferencesForm(prevForm => ({ ...prevForm, ...userPreferences }));
+    if (userPreferences && typeof userPreferences === 'object') {
+      console.log('Loading user preferences:', userPreferences);
+      setPreferencesForm(prevForm => ({
+        ...prevForm,
+        ...userPreferences
+      } as UserPreferences));
     }
   }, [userPreferences]);
 
@@ -229,6 +260,25 @@ export default function SettingsPage() {
 
   const handleSavePreferences = () => {
     updatePreferencesMutation.mutate(preferencesForm);
+    
+    // Apply preferences immediately to local storage for instant UI updates
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('userPreferences', JSON.stringify(preferencesForm));
+      
+      // Apply theme changes immediately
+      if (preferencesForm.theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      
+      // Force a page refresh if language changed to apply new language
+      const currentLang = localStorage.getItem('language') || 'es';
+      if (preferencesForm.language !== currentLang) {
+        localStorage.setItem('language', preferencesForm.language);
+        setTimeout(() => window.location.reload(), 1000);
+      }
+    }
   };
 
   const handleChangeCredentials = () => {
