@@ -104,7 +104,7 @@ export class DatabaseStorage implements IStorage {
     }
 
     const [user] = await db
-      .insert(users)
+      .insert(usersTable)
       .values({
         email: userData.email,
         username: userData.username,
@@ -145,9 +145,9 @@ export class DatabaseStorage implements IStorage {
 
   async updateLastLogin(userId: number): Promise<void> {
     await db
-      .update(users)
+      .update(usersTable)
       .set({ lastLogin: new Date() })
-      .where(eq(users.id, userId));
+      .where(eq(usersTable.id, userId));
   }
 
   async updateSubscription(userId: number, subscriptionData: {
@@ -156,13 +156,13 @@ export class DatabaseStorage implements IStorage {
     subscriptionEndDate: Date;
   }): Promise<void> {
     await db
-      .update(users)
+      .update(usersTable)
       .set({
         subscriptionType: subscriptionData.subscriptionType,
         subscriptionStartDate: subscriptionData.subscriptionStartDate,
         subscriptionEndDate: subscriptionData.subscriptionEndDate
       })
-      .where(eq(users.id, userId));
+      .where(eq(usersTable.id, userId));
   }
 
   async incrementRoundCount(userId: number): Promise<void> {
@@ -176,38 +176,38 @@ export class DatabaseStorage implements IStorage {
     // Reset counter if it's been more than 30 days
     if (daysSinceReset >= 30) {
       await db
-        .update(users)
+        .update(usersTable)
         .set({
           roundsThisMonth: 1,
           lastMonthReset: now
         })
-        .where(eq(users.id, userId));
+        .where(eq(usersTable.id, userId));
     } else {
       await db
-        .update(users)
+        .update(usersTable)
         .set({
           roundsThisMonth: user.roundsThisMonth + 1
         })
-        .where(eq(users.id, userId));
+        .where(eq(usersTable.id, userId));
     }
   }
 
   async updateHandicap(userId: number, handicap: number): Promise<void> {
     await db
-      .update(users)
+      .update(usersTable)
       .set({
         handicap: handicap,
         handicapVerified: true,
         handicapLastVerified: new Date()
       })
-      .where(eq(users.id, userId));
+      .where(eq(usersTable.id, userId));
   }
 
   async updateUser(userId: number, updates: Partial<User>): Promise<User> {
     const [updatedUser] = await db
-      .update(users)
+      .update(usersTable)
       .set(updates)
-      .where(eq(users.id, userId))
+      .where(eq(usersTable.id, userId))
       .returning();
     
     if (!updatedUser) {
@@ -220,7 +220,7 @@ export class DatabaseStorage implements IStorage {
   async deleteUser(userId: number): Promise<void> {
     await db
       .delete(users)
-      .where(eq(users.id, userId));
+      .where(eq(usersTable.id, userId));
   }
 
   // User preferences operations
@@ -348,8 +348,8 @@ export class DatabaseStorage implements IStorage {
       .select({
         id: socialPosts.id,
         userId: socialPosts.userId,
-        userName: users.name,
-        userHandicap: users.handicap,
+        userName: usersTable.name,
+        userHandicap: usersTable.handicap,
         content: socialPosts.content,
         courseId: socialPosts.courseId,
         courseName: socialPosts.courseName,
@@ -408,12 +408,12 @@ export class DatabaseStorage implements IStorage {
   async searchUsers(query: string): Promise<User[]> {
     const userResults = await db
       .select()
-      .from(users)
+      .from(usersTable)
       .where(
         or(
-          eq(users.name, query),
-          eq(users.username, query),
-          eq(users.email, query)
+          eq(usersTable.name, query),
+          eq(usersTable.username, query),
+          eq(usersTable.email, query)
         )
       )
       .limit(10);
