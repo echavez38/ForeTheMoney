@@ -52,6 +52,11 @@ export interface IStorage {
   likeSocialPost(postId: number, userId: number): Promise<void>;
   unlikeSocialPost(postId: number, userId: number): Promise<void>;
   addSocialComment(postId: number, userId: number, content: string): Promise<SocialComment>;
+  
+  // Friend and search operations
+  searchUsers(query: string): Promise<User[]>;
+  getUserFriends(userId: number): Promise<User[]>;
+  addFriend(userId: number, friendId: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -397,6 +402,32 @@ export class DatabaseStorage implements IStorage {
       .values({ postId, userId, content })
       .returning();
     return comment;
+  }
+
+  // Friend and search operations
+  async searchUsers(query: string): Promise<User[]> {
+    const userResults = await db
+      .select()
+      .from(users)
+      .where(
+        or(
+          eq(users.name, query),
+          eq(users.username, query),
+          eq(users.email, query)
+        )
+      )
+      .limit(10);
+    return userResults;
+  }
+
+  async getUserFriends(userId: number): Promise<User[]> {
+    // For now, return empty array - friendship system can be expanded later
+    return [];
+  }
+
+  async addFriend(userId: number, friendId: number): Promise<void> {
+    // For now, just log the friend request - friendship system can be expanded later
+    console.log(`User ${userId} wants to add friend ${friendId}`);
   }
 }
 

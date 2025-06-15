@@ -144,7 +144,7 @@ export function useTranslation() {
     
     // Update preferences
     const preferences = PreferencesManager.getPreferences();
-    PreferencesManager.savePreferences({ ...preferences, language: newLanguage });
+    PreferencesManager.setPreferences({ ...preferences, language: newLanguage });
   };
 
   useEffect(() => {

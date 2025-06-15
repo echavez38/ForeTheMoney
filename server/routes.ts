@@ -639,6 +639,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User search for friend functionality
+  app.get("/api/users/search", async (req, res) => {
+    try {
+      const query = (req.query.q || req.query.searchQuery) as string;
+      
+      if (!query || query.length < 2) {
+        return res.json([]);
+      }
+
+      const users = await storage.searchUsers(query);
+      res.json(users);
+    } catch (error) {
+      console.error(`Error searching users: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // Friend management routes
+  app.get("/api/friends", async (req, res) => {
+    try {
+      const userId = 1; // In real app, get from session/auth
+      const friends = await storage.getUserFriends(userId);
+      res.json(friends);
+    } catch (error) {
+      console.error(`Error getting friends: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.post("/api/friends/add", async (req, res) => {
+    try {
+      const userId = 1; // In real app, get from session/auth
+      const { friendId } = req.body;
+
+      await storage.addFriend(userId, friendId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error(`Error adding friend: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
   // Game room management
   interface GameRoom {
     id: string;
