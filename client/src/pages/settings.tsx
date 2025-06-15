@@ -14,7 +14,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { StorageManager } from '@/lib/storage';
-import { PreferencesManager, type UserPreferences as PrefsType, getTranslation } from '@/lib/preferences';
+import { PreferencesManager, type UserPreferences as PrefsType, useTranslation } from '@/lib/preferences';
 import { 
   User, Mail, Shield, Bell, CreditCard, Database, 
   Palette, Globe, ArrowLeft, Save, Crown, Trash2,
@@ -76,6 +76,7 @@ export default function SettingsPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t, language } = useTranslation();
   
   // Form states
   const [profileForm, setProfileForm] = useState<Partial<UserProfile>>({});
@@ -347,8 +348,8 @@ export default function SettingsPage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-white">Configuración</h1>
-            <p className="text-green-100">Personaliza tu experiencia de golf</p>
+            <h1 className="text-2xl font-bold text-white">{t('settings')}</h1>
+            <p className="text-green-100">{t('personalizeExperience')}</p>
           </div>
         </div>
 
@@ -356,19 +357,19 @@ export default function SettingsPage() {
           <TabsList className="grid w-full grid-cols-4 bg-dark-card border-gray-600">
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="h-4 w-4" />
-              Perfil
+              {t('profile')}
             </TabsTrigger>
             <TabsTrigger value="preferences" className="flex items-center gap-2">
               <SettingsIcon className="h-4 w-4" />
-              Preferencias
+              {t('preferences')}
             </TabsTrigger>
             <TabsTrigger value="subscription" className="flex items-center gap-2">
               <Crown className="h-4 w-4" />
-              Suscripción
+              {t('subscription')}
             </TabsTrigger>
             <TabsTrigger value="privacy" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
-              Privacidad
+              {t('privacy')}
             </TabsTrigger>
           </TabsList>
 
@@ -545,23 +546,23 @@ export default function SettingsPage() {
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <SettingsIcon className="h-5 w-5" />
-                  Preferencias de Juego
+                  {t('gamePreferences')}
                 </CardTitle>
                 <CardDescription className="text-gray-400">
-                  Configura tus preferencias predeterminadas
+                  {t('configureDefaultPreferences')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-white">Unidad de Distancia</Label>
+                    <Label className="text-white">{t('distanceUnit')}</Label>
                     <Select value={preferencesForm.distanceUnit} onValueChange={(value: 'meters' | 'yards') => setPreferencesForm({...preferencesForm, distanceUnit: value})}>
                       <SelectTrigger className="bg-dark-card border-gray-600 text-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="meters">Metros</SelectItem>
-                        <SelectItem value="yards">Yardas</SelectItem>
+                        <SelectItem value="meters">{t('meters')}</SelectItem>
+                        <SelectItem value="yards">{t('yards')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

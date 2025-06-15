@@ -123,6 +123,32 @@ export class PreferencesManager {
 // Language translations
 export const translations = {
   es: {
+    // Navigation and general
+    dashboard: 'Tablero',
+    settings: 'Configuración',
+    analytics: 'Analíticas', 
+    subscription: 'Suscripción',
+    logout: 'Cerrar Sesión',
+    
+    // Settings page
+    profile: 'Perfil',
+    preferences: 'Preferencias',
+    privacy: 'Privacidad',
+    personalizeExperience: 'Personaliza tu experiencia de golf',
+    gamePreferences: 'Preferencias de Juego',
+    configureDefaultPreferences: 'Configura tus preferencias predeterminadas',
+    distanceUnit: 'Unidad de Distancia',
+    defaultTees: 'Tees Predeterminados',
+    defaultBettingAmount: 'Apuesta Predeterminada ($)',
+    gameFormat: 'Formato de Juego',
+    notifications: 'Notificaciones',
+    emailNotifications: 'Envío de actualizaciones',
+    interface: 'Interfaz',
+    theme: 'Tema',
+    language: 'Idioma',
+    savePreferences: 'Guardar Preferencias',
+    
+    // Values
     meters: 'Metros',
     yards: 'Yardas',
     dark: 'Oscuro',
@@ -133,9 +159,51 @@ export const translations = {
     large: 'Grande',
     stroke: 'Stroke Play',
     match: 'Match Play',
-    both: 'Ambos'
+    both: 'Ambos',
+    spanish: 'Español',
+    english: 'Inglés',
+    
+    // Golf Hub
+    golfHub: 'Golf Hub',
+    recentRounds: 'Rondas Recientes',
+    quickStats: 'Estadísticas Rápidas',
+    achievements: 'Logros',
+    friends: 'Amigos',
+    
+    // Create Round
+    createRound: 'Crear Ronda',
+    selectCourse: 'Seleccionar Campo',
+    addPlayers: 'Agregar Jugadores',
+    bettingOptions: 'Opciones de Apuestas',
+    startRound: 'Comenzar Ronda'
   },
   en: {
+    // Navigation and general
+    dashboard: 'Dashboard',
+    settings: 'Settings',
+    analytics: 'Analytics',
+    subscription: 'Subscription', 
+    logout: 'Logout',
+    
+    // Settings page
+    profile: 'Profile',
+    preferences: 'Preferences',
+    privacy: 'Privacy',
+    personalizeExperience: 'Personalize your golf experience',
+    gamePreferences: 'Game Preferences',
+    configureDefaultPreferences: 'Configure your default preferences',
+    distanceUnit: 'Distance Unit',
+    defaultTees: 'Default Tees',
+    defaultBettingAmount: 'Default Betting Amount ($)',
+    gameFormat: 'Game Format',
+    notifications: 'Notifications',
+    emailNotifications: 'Email updates',
+    interface: 'Interface',
+    theme: 'Theme',
+    language: 'Language',
+    savePreferences: 'Save Preferences',
+    
+    // Values
     meters: 'Meters',
     yards: 'Yards',
     dark: 'Dark',
@@ -146,10 +214,36 @@ export const translations = {
     large: 'Large',
     stroke: 'Stroke Play',
     match: 'Match Play',
-    both: 'Both'
+    both: 'Both',
+    spanish: 'Spanish',
+    english: 'English',
+    
+    // Golf Hub
+    golfHub: 'Golf Hub',
+    recentRounds: 'Recent Rounds',
+    quickStats: 'Quick Stats',
+    achievements: 'Achievements',
+    friends: 'Friends',
+    
+    // Create Round
+    createRound: 'Create Round',
+    selectCourse: 'Select Course',
+    addPlayers: 'Add Players',
+    bettingOptions: 'Betting Options',
+    startRound: 'Start Round'
   }
 };
 
 export function getTranslation(key: string, language: 'es' | 'en' = 'es'): string {
   return translations[language][key as keyof typeof translations.es] || key;
+}
+
+// Hook for using translations in components
+export function useTranslation() {
+  const currentLang = (typeof window !== 'undefined' ? localStorage.getItem('language') : 'es') as 'es' | 'en' || 'es';
+  
+  return {
+    t: (key: string) => getTranslation(key, currentLang),
+    language: currentLang
+  };
 }
