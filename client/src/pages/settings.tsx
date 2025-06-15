@@ -14,7 +14,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { StorageManager } from '@/lib/storage';
-import { PreferencesManager, type UserPreferences as PrefsType } from '@/lib/preferences';
+import { PreferencesManager, type UserPreferences as PrefsType, getTranslation } from '@/lib/preferences';
 import { 
   User, Mail, Shield, Bell, CreditCard, Database, 
   Palette, Globe, ArrowLeft, Save, Crown, Trash2,
@@ -109,6 +109,13 @@ export default function SettingsPage() {
 
   // Get current user
   const currentUser = StorageManager.getUser();
+
+  // Initialize preferences on component mount
+  useEffect(() => {
+    PreferencesManager.initializePreferences();
+    const savedPrefs = PreferencesManager.getPreferences();
+    setPreferencesForm(savedPrefs);
+  }, []);
 
   // Fetch user profile
   const { data: userProfile, isLoading: profileLoading } = useQuery({
@@ -259,25 +266,22 @@ export default function SettingsPage() {
   };
 
   const handleSavePreferences = () => {
+    // Save to database
     updatePreferencesMutation.mutate(preferencesForm);
     
-    // Apply preferences immediately to local storage for instant UI updates
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('userPreferences', JSON.stringify(preferencesForm));
-      
-      // Apply theme changes immediately
-      if (preferencesForm.theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-      
-      // Force a page refresh if language changed to apply new language
-      const currentLang = localStorage.getItem('language') || 'es';
-      if (preferencesForm.language !== currentLang) {
-        localStorage.setItem('language', preferencesForm.language);
-        setTimeout(() => window.location.reload(), 1000);
-      }
+    // Apply preferences immediately using the preferences manager
+    PreferencesManager.setPreferences(preferencesForm);
+    
+    // Check if language changed to reload the page
+    const currentLang = localStorage.getItem('language') || 'es';
+    if (preferencesForm.language !== currentLang) {
+      setTimeout(() => {
+        toast({
+          title: "Idioma cambiado",
+          description: "La página se recargará para aplicar el nuevo idioma.",
+        });
+        setTimeout(() => window.location.reload(), 1500);
+      }, 500);
     }
   };
 
