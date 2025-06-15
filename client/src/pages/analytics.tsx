@@ -2,10 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StorageManager } from '@/lib/storage';
 import { User, Round } from '@/lib/types';
-import { ArrowLeft, TrendingUp, TrendingDown, Target, BarChart3, Calendar, Trophy, Zap } from 'lucide-react';
+import { ArrowLeft, TrendingUp, TrendingDown, Target, BarChart3, Calendar, Trophy, Zap, Users, Bell } from 'lucide-react';
 import { BottomNavigation } from '@/components/bottom-navigation';
+import AchievementsSystem from '@/components/achievements-system';
+import AdvancedAnalytics from '@/components/advanced-analytics';
+import SocialFeatures from '@/components/social-features';
+import NotificationSystem from '@/components/notification-system';
 
 export default function Analytics() {
   const [, setLocation] = useLocation();
