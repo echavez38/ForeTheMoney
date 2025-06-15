@@ -1,4 +1,4 @@
-import { users, rounds, players, scores, type User, type InsertUser, type RegisterUser, type LoginUser, type Round, type Player, type Score, type InsertRound, type InsertPlayer, type InsertScore } from "@shared/schema";
+import { users, rounds, players, scores, userPreferences, type User, type InsertUser, type RegisterUser, type LoginUser, type Round, type Player, type Score, type InsertRound, type InsertPlayer, type InsertScore, type UserPreferences, type InsertUserPreferences, type UpdateUserPreferences } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or } from "drizzle-orm";
 import bcrypt from "bcryptjs";
