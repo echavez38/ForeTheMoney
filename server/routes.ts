@@ -555,6 +555,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Social feed routes
+  app.get("/api/social/feed", async (req, res) => {
+    try {
+      const userId = req.query.userId as string;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const offset = parseInt(req.query.offset as string) || 0;
+
+      const posts = await storage.getSocialFeed(userId ? parseInt(userId) : undefined, limit, offset);
+      res.json(posts);
+    } catch (error) {
+      console.error(`Error fetching social feed: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.post("/api/social/posts", async (req, res) => {
+    try {
+      const { content, visibility, highlights, courseId, courseName, totalScore, par, roundDate } = req.body;
+      const userId = 1; // In real app, get from session/auth
+
+      const postData = {
+        userId,
+        content,
+        visibility: visibility || 'public',
+        highlights: highlights ? JSON.stringify(highlights) : '[]',
+        courseId,
+        courseName,
+        totalScore: totalScore ? parseInt(totalScore) : null,
+        par: par ? parseInt(par) : null,
+        roundDate: roundDate ? new Date(roundDate) : null,
+      };
+
+      const post = await storage.createSocialPost(postData);
+      res.json({ success: true, post });
+    } catch (error) {
+      console.error(`Error creating social post: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.post("/api/social/posts/:id/like", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      const userId = 1; // In real app, get from session/auth
+
+      await storage.likeSocialPost(postId, userId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error(`Error liking post: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.post("/api/social/posts/:id/unlike", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      const userId = 1; // In real app, get from session/auth
+
+      await storage.unlikeSocialPost(postId, userId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error(`Error unliking post: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.post("/api/social/posts/:id/comments", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      const userId = 1; // In real app, get from session/auth
+      const { content } = req.body;
+
+      if (!content || !content.trim()) {
+        return res.status(400).json({ error: "Contenido del comentario requerido" });
+      }
+
+      const comment = await storage.addSocialComment(postId, userId, content.trim());
+      res.json({ success: true, comment });
+    } catch (error) {
+      console.error(`Error adding comment: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
   // Game room management
   interface GameRoom {
     id: string;

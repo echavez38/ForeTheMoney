@@ -1,6 +1,6 @@
 import { users, rounds, players, scores, userPreferences, socialPosts, socialPostLikes, socialPostComments, type User, type InsertUser, type RegisterUser, type LoginUser, type Round, type Player, type Score, type InsertRound, type InsertPlayer, type InsertScore, type UserPreferences, type InsertUserPreferences, type UpdateUserPreferences, type SocialPost, type InsertSocialPost, type SocialComment, type InsertSocialComment } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, or } from "drizzle-orm";
+import { eq, desc, or, and } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export interface IStorage {
@@ -335,6 +335,68 @@ export class DatabaseStorage implements IStorage {
       .where(eq(scores.id, id))
       .returning();
     return score || undefined;
+  }
+
+  // Social operations
+  async getSocialFeed(userId?: number, limit: number = 20, offset: number = 0): Promise<any[]> {
+    const posts = await db
+      .select({
+        id: socialPosts.id,
+        userId: socialPosts.userId,
+        userName: users.name,
+        userHandicap: users.handicap,
+        content: socialPosts.content,
+        courseId: socialPosts.courseId,
+        courseName: socialPosts.courseName,
+        roundDate: socialPosts.roundDate,
+        totalScore: socialPosts.totalScore,
+        par: socialPosts.par,
+        highlights: socialPosts.highlights,
+        imageUrl: socialPosts.imageUrl,
+        visibility: socialPosts.visibility,
+        likes: socialPosts.likes,
+        commentsCount: socialPosts.commentsCount,
+        createdAt: socialPosts.createdAt,
+      })
+      .from(socialPosts)
+      .innerJoin(users, eq(socialPosts.userId, users.id))
+      .where(eq(socialPosts.visibility, 'public'))
+      .orderBy(desc(socialPosts.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return posts.map(post => ({
+      ...post,
+      scoreTopar: post.totalScore && post.par ? post.totalScore - post.par : 0,
+      highlights: post.highlights || [],
+      hasLiked: false,
+      comments: [],
+    }));
+  }
+
+  async createSocialPost(postData: Partial<InsertSocialPost>): Promise<SocialPost> {
+    const [post] = await db
+      .insert(socialPosts)
+      .values(postData as InsertSocialPost)
+      .returning();
+    return post;
+  }
+
+  async likeSocialPost(postId: number, userId: number): Promise<void> {
+    await db.insert(socialPostLikes).values({ postId, userId }).onConflictDoNothing();
+  }
+
+  async unlikeSocialPost(postId: number, userId: number): Promise<void> {
+    await db.delete(socialPostLikes)
+      .where(and(eq(socialPostLikes.postId, postId), eq(socialPostLikes.userId, userId)));
+  }
+
+  async addSocialComment(postId: number, userId: number, content: string): Promise<SocialComment> {
+    const [comment] = await db
+      .insert(socialPostComments)
+      .values({ postId, userId, content })
+      .returning();
+    return comment;
   }
 }
 
