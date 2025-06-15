@@ -28,36 +28,57 @@ Mobile-optimized web application for golf scoring and betting calculations speci
 - Proper handicap indexing for each hole
 
 ## Recent Changes
+**June 15, 2025**
+- **COMPREHENSIVE FEATURE EXPANSION**: Major upgrade transforming the app into a complete golf management platform:
+
+  **🏆 ACHIEVEMENTS & BADGES SYSTEM**: 
+  - Complete achievement tracking across 4 categories (Scoring, Consistency, Social, Milestones)
+  - 20+ unlockable achievements with bronze/silver/gold/platinum difficulty levels
+  - Point-based scoring system with progress tracking
+  - Social sharing capabilities for achievements
+  - Visual badge system with category-specific icons and colors
+
+  **📊 ADVANCED ANALYTICS DASHBOARD**:
+  - Multi-tab analytics with Progress, Holes, Performance, and Trends views
+  - Interactive charts for score evolution, handicap tracking, and performance distribution
+  - Hole-by-hole analysis with difficulty ratings and birdie rates
+  - Monthly statistics with earnings and rounds tracking
+  - Filtering by time periods and golf courses
+  - Moving averages and trend analysis
+
+  **👥 SOCIAL GOLF FEATURES**:
+  - Friend system with mutual connections and online status
+  - Dynamic leaderboards by handicap, winnings, rounds, and improvement
+  - Activity feed with round sharing, likes, and comments
+  - Social invitations via email and shareable codes
+  - Multi-platform sharing (Facebook, Twitter, WhatsApp)
+  - Real-time activity updates and notifications
+
+  **🔔 PUSH NOTIFICATION SYSTEM**:
+  - Comprehensive notification preferences with 8 different types
+  - Service Worker integration for background notifications
+  - Quiet hours configuration and sound settings
+  - Priority-based notifications (high/medium/low)
+  - Real-time notification management interface
+
+  **🧭 COURSE TOOLS & CONDITIONS**:
+  - Advanced distance calculator with weather adjustments
+  - Real-time weather data integration (temperature, wind, humidity)
+  - Club recommendation system based on conditions
+  - Hole-specific notes with club and weather tracking
+  - Elevation and wind speed adjustments for distance calculations
+
+  **⚙️ COMPREHENSIVE SETTINGS**:
+  - Complete user profile management with GHIN integration
+  - Authentication method switching (PIN/password)
+  - Game preferences with default tees and betting amounts
+  - Privacy controls and data export options
+  - Account deletion with confirmation workflow
+
 **June 14, 2025**
-- **GHIN HANDICAP INTEGRATION**: Official USGA handicap verification system implemented:
-  - GHIN number field added to user registration with automatic verification
-  - Real-time handicap validation against official USGA GHIN database
-  - Prevents handicap fraud by verifying against official records
-  - API endpoints for handicap verification, player search, and automatic updates
-  - Database schema updated with handicap verification status tracking
-  - Registration form includes optional GHIN number with validation
-  - System falls back to local verification when GHIN API unavailable
-  - Ready for production with GHIN API credentials (GHIN_API_KEY, GHIN_CLIENT_ID, GHIN_CLIENT_SECRET)
-
-- **SUBSCRIPTION SYSTEM**: Comprehensive freemium business model implemented:
-  - **Free Plan (Basic Golf)**: 3 rondas/mes, 4 jugadores, 1 campo, betting básico
-  - **Premium Plan (Pro Golfer)**: $4.99/mes, rondas ilimitadas, 6 jugadores, todos los campos
-  - Database schema updated with subscription fields and round tracking
-  - Real-time subscription validation and limit enforcement
-  - Professional subscription management page with upgrade functionality
-  - Dashboard integration with Premium button and status indicators
-  - API endpoints for subscription info, pricing, and upgrades
-  - Monthly round counter with automatic reset functionality
-  - Ready for payment processor integration (Stripe/PayPal)
-
-- **EMAIL WELCOME SYSTEM**: Implemented automatic welcome emails for new registrations:
-  - Professional HTML email template with golf theme and brand styling
-  - Includes user account information, feature overview, and getting started tips
-  - Automatic sending after successful registration using Nodemailer
-  - Development mode uses Ethereal Email test accounts with preview URLs
-  - Production ready for Gmail/SMTP configuration with environment variables
-  - Visual notification in registration form about welcome email
-  - Enhanced user onboarding experience with comprehensive app introduction
+- **GHIN HANDICAP INTEGRATION**: Official USGA handicap verification system implemented
+- **SUBSCRIPTION SYSTEM**: Comprehensive freemium business model with Basic Golf (free) vs Pro Golfer ($4.99/month)
+- **EMAIL WELCOME SYSTEM**: Automatic welcome emails with professional templates
 
 **June 13, 2025**
 - Updated Club Campestre de Puebla hole data with authentic yardages and layout

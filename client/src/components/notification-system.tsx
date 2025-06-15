@@ -206,9 +206,10 @@ export function NotificationSystem({ className }: NotificationSystemProps) {
         badge: '/badge-72x72.png',
         tag: notification.id,
         requireInteraction: notification.priority === 'high',
-        actions: notification.actionUrl ? [
-          { action: 'view', title: notification.actionText || 'Ver' }
-        ] : undefined
+        data: notification.actionUrl ? {
+          actionUrl: notification.actionUrl,
+          actionText: notification.actionText || 'Ver'
+        } : undefined
       });
     }
   };
