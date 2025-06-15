@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, real, jsonb, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, real, jsonb, json, varchar, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
@@ -240,3 +240,115 @@ export const updateUserPreferencesSchema = insertUserPreferencesSchema.partial()
 export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
 export type UpdateUserPreferences = z.infer<typeof updateUserPreferencesSchema>;
 export type UserPreferences = typeof userPreferences.$inferSelect;
+
+// Social posts table
+export const socialPosts = pgTable("social_posts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  content: text("content").notNull(),
+  courseId: varchar("course_id", { length: 50 }),
+  courseName: varchar("course_name", { length: 100 }),
+  roundDate: timestamp("round_date"),
+  totalScore: integer("total_score"),
+  par: integer("par"),
+  highlights: jsonb("highlights").default([]),
+  imageUrl: varchar("image_url", { length: 500 }),
+  visibility: varchar("visibility", { length: 10 }).default('public').notNull(),
+  likes: integer("likes").default(0).notNull(),
+  commentsCount: integer("comments_count").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Social post likes table
+export const socialPostLikes = pgTable("social_post_likes", {
+  id: serial("id").primaryKey(),
+  postId: integer("post_id").references(() => socialPosts.id, { onDelete: "cascade" }).notNull(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Social post comments table
+export const socialPostComments = pgTable("social_post_comments", {
+  id: serial("id").primaryKey(),
+  postId: integer("post_id").references(() => socialPosts.id, { onDelete: "cascade" }).notNull(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Friends relationship table
+export const friendships = pgTable("friendships", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  friendId: integer("friend_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  status: varchar("status", { length: 20 }).default('pending').notNull(), // pending, accepted, blocked
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Social relations
+export const socialPostsRelations = relations(socialPosts, ({ one, many }) => ({
+  user: one(users, {
+    fields: [socialPosts.userId],
+    references: [users.id],
+  }),
+  likes: many(socialPostLikes),
+  comments: many(socialPostComments),
+}));
+
+export const socialPostLikesRelations = relations(socialPostLikes, ({ one }) => ({
+  post: one(socialPosts, {
+    fields: [socialPostLikes.postId],
+    references: [socialPosts.id],
+  }),
+  user: one(users, {
+    fields: [socialPostLikes.userId],
+    references: [users.id],
+  }),
+}));
+
+export const socialPostCommentsRelations = relations(socialPostComments, ({ one }) => ({
+  post: one(socialPosts, {
+    fields: [socialPostComments.postId],
+    references: [socialPosts.id],
+  }),
+  user: one(users, {
+    fields: [socialPostComments.userId],
+    references: [users.id],
+  }),
+}));
+
+export const friendshipsRelations = relations(friendships, ({ one }) => ({
+  user: one(users, {
+    fields: [friendships.userId],
+    references: [users.id],
+  }),
+  friend: one(users, {
+    fields: [friendships.friendId],
+    references: [users.id],
+  }),
+}));
+
+// Social schemas
+export const insertSocialPostSchema = createInsertSchema(socialPosts).omit({
+  id: true,
+  likes: true,
+  commentsCount: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSocialCommentSchema = createInsertSchema(socialPostComments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertSocialPost = z.infer<typeof insertSocialPostSchema>;
+export type SocialPost = typeof socialPosts.$inferSelect;
+export type InsertSocialComment = z.infer<typeof insertSocialCommentSchema>;
+export type SocialComment = typeof socialPostComments.$inferSelect;
+export type SocialPostLike = typeof socialPostLikes.$inferSelect;
+export type Friendship = typeof friendships.$inferSelect;
