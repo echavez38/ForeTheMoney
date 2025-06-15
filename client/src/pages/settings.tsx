@@ -89,6 +89,12 @@ export default function SettingsPage() {
     enabled: !!currentUser?.id
   });
 
+  // Fetch user preferences
+  const { data: userPreferences, isLoading: preferencesLoading } = useQuery({
+    queryKey: ['/api/users', currentUser?.id, 'preferences'],
+    enabled: !!currentUser?.id
+  });
+
   // Fetch subscription info
   const { data: subscriptionInfo } = useQuery<SubscriptionInfo>({
     queryKey: ['/api/subscription/info', currentUser?.id],
@@ -101,6 +107,12 @@ export default function SettingsPage() {
       setProfileForm(userProfile);
     }
   }, [userProfile]);
+
+  useEffect(() => {
+    if (userPreferences && Object.keys(userPreferences).length > 0) {
+      setPreferencesForm(prevForm => ({ ...prevForm, ...userPreferences }));
+    }
+  }, [userPreferences]);
 
   // Update profile mutation
   const updateProfileMutation = useMutation({
@@ -184,8 +196,39 @@ export default function SettingsPage() {
     }
   });
 
+  // Update preferences mutation
+  const updatePreferencesMutation = useMutation({
+    mutationFn: async (data: Partial<UserPreferences>) => {
+      const response = await fetch(`/api/users/${currentUser?.id}/preferences`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Failed to update preferences');
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Preferencias guardadas",
+        description: "Tus configuraciones han sido guardadas correctamente.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/users', currentUser?.id, 'preferences'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudieron guardar las preferencias",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleSaveProfile = () => {
     updateProfileMutation.mutate(profileForm);
+  };
+
+  const handleSavePreferences = () => {
+    updatePreferencesMutation.mutate(preferencesForm);
   };
 
   const handleChangeCredentials = () => {
@@ -569,9 +612,13 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="flex justify-end">
-                  <Button className="bg-green-600 hover:bg-green-700">
+                  <Button 
+                    onClick={handleSavePreferences}
+                    disabled={updatePreferencesMutation.isPending}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
                     <Save className="h-4 w-4 mr-2" />
-                    Guardar Preferencias
+                    {updatePreferencesMutation.isPending ? 'Guardando...' : 'Guardar Preferencias'}
                   </Button>
                 </div>
               </CardContent>

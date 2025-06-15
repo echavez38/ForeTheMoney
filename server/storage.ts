@@ -211,6 +211,47 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, userId));
   }
 
+  // User preferences operations
+  async getUserPreferences(userId: number): Promise<UserPreferences | undefined> {
+    const [preferences] = await db
+      .select()
+      .from(userPreferences)
+      .where(eq(userPreferences.userId, userId));
+    return preferences;
+  }
+
+  async createUserPreferences(preferences: InsertUserPreferences): Promise<UserPreferences> {
+    const [newPreferences] = await db
+      .insert(userPreferences)
+      .values(preferences)
+      .returning();
+    return newPreferences;
+  }
+
+  async updateUserPreferences(userId: number, updates: UpdateUserPreferences): Promise<UserPreferences> {
+    const [updatedPreferences] = await db
+      .update(userPreferences)
+      .set({
+        ...updates,
+        updatedAt: new Date()
+      })
+      .where(eq(userPreferences.userId, userId))
+      .returning();
+    
+    if (!updatedPreferences) {
+      // Create preferences if they don't exist
+      return this.createUserPreferences({ userId, ...updates });
+    }
+    
+    return updatedPreferences;
+  }
+
+  async deleteUserPreferences(userId: number): Promise<void> {
+    await db
+      .delete(userPreferences)
+      .where(eq(userPreferences.userId, userId));
+  }
+
   async createRound(insertRound: InsertRound): Promise<Round> {
     const [round] = await db
       .insert(rounds)

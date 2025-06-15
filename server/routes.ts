@@ -6,7 +6,7 @@ import { storage } from "./storage";
 import { emailService } from "./email";
 import { SubscriptionService } from "./subscription";
 import { ghinService } from "./ghin";
-import { insertUserSchema, insertRoundSchema, insertPlayerSchema, insertScoreSchema, registerUserSchema, loginUserSchema } from "@shared/schema";
+import { insertUserSchema, insertRoundSchema, insertPlayerSchema, insertScoreSchema, registerUserSchema, loginUserSchema, updateUserPreferencesSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
@@ -332,6 +332,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, message: "Credenciales actualizadas correctamente" });
     } catch (error) {
       console.error(`Error changing credentials: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  // User preferences routes
+  app.get("/api/users/:id/preferences", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const preferences = await storage.getUserPreferences(userId);
+      
+      if (!preferences) {
+        // Return default preferences if none exist
+        const defaultPreferences = {
+          distanceUnit: 'meters',
+          defaultTees: 'Azules',
+          defaultBettingAmount: 10,
+          defaultGameFormat: 'both',
+          emailNotifications: true,
+          theme: 'dark',
+          language: 'es',
+          fontSize: 'medium',
+          roundReminders: true,
+          handicapUpdates: true,
+          friendInvites: true,
+          achievements: true,
+          weeklyReports: false,
+          socialActivity: true,
+          betResults: true,
+          courseConditions: false,
+          sound: true,
+          vibration: true,
+          quietHoursEnabled: false,
+          quietHoursStart: '22:00',
+          quietHoursEnd: '08:00'
+        };
+        return res.json(defaultPreferences);
+      }
+      
+      res.json(preferences);
+    } catch (error) {
+      console.error(`Error fetching user preferences: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.post("/api/users/:id/preferences", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const updates = updateUserPreferencesSchema.parse(req.body);
+
+      const preferences = await storage.updateUserPreferences(userId, updates);
+      res.json({ success: true, preferences, message: "Preferencias guardadas correctamente" });
+    } catch (error) {
+      console.error(`Error updating user preferences: ${error}`);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+
+  app.put("/api/users/:id/preferences", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const updates = updateUserPreferencesSchema.parse(req.body);
+
+      const preferences = await storage.updateUserPreferences(userId, updates);
+      res.json({ success: true, preferences, message: "Preferencias actualizadas correctamente" });
+    } catch (error) {
+      console.error(`Error updating user preferences: ${error}`);
       res.status(500).json({ error: "Error interno del servidor" });
     }
   });
