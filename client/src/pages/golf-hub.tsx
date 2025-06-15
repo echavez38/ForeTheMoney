@@ -8,7 +8,7 @@ import { ArrowLeft, BarChart3, Trophy, Users, Bell, Target } from 'lucide-react'
 import { BottomNavigation } from '@/components/bottom-navigation';
 import AchievementsSystem from '@/components/achievements-system';
 import AdvancedAnalytics from '@/components/advanced-analytics';
-import { SocialNetwork } from '@/components/social-network';
+import { WorkingSocialNetwork } from '@/components/working-social-network';
 import NotificationSystem from '@/components/notification-system';
 
 export default function GolfHub() {
@@ -151,10 +151,10 @@ export default function GolfHub() {
           </TabsContent>
 
           <TabsContent value="social">
-            <SocialNetwork currentUser={{
+            <WorkingSocialNetwork currentUser={{
               id: user.id,
               name: user.name,
-              handicap: parseInt(user.handicap) || 18
+              handicap: parseInt(user.handicap.toString()) || 18
             }} />
           </TabsContent>
 

@@ -1,4 +1,4 @@
-import { users, rounds, players, scores, userPreferences, socialPosts, socialPostLikes, socialPostComments, type User, type InsertUser, type RegisterUser, type LoginUser, type Round, type Player, type Score, type InsertRound, type InsertPlayer, type InsertScore, type UserPreferences, type InsertUserPreferences, type UpdateUserPreferences, type SocialPost, type InsertSocialPost, type SocialComment, type InsertSocialComment } from "@shared/schema";
+import { users as usersTable, rounds, players, scores, userPreferences, socialPosts, socialPostLikes, socialPostComments, type User, type InsertUser, type RegisterUser, type LoginUser, type Round, type Player, type Score, type InsertRound, type InsertPlayer, type InsertScore, type UserPreferences, type InsertUserPreferences, type UpdateUserPreferences, type SocialPost, type InsertSocialPost, type SocialComment, type InsertSocialComment } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, and } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -61,35 +61,35 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, id));
     return user || undefined;
   }
 
   async getUserByPin(pin: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.pin, pin));
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.pin, pin));
     return user || undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
     return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.username, username));
     return user || undefined;
   }
 
   async getUserByIdentifier(identifier: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(
-      or(eq(users.email, identifier), eq(users.username, identifier))
+    const [user] = await db.select().from(usersTable).where(
+      or(eq(usersTable.email, identifier), eq(usersTable.username, identifier))
     );
     return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db
-      .insert(users)
+      .insert(usersTable)
       .values(insertUser)
       .returning();
     return user;

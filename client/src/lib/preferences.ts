@@ -122,6 +122,12 @@ export class PreferencesManager {
   static initializePreferences(): void {
     const preferences = this.getPreferences();
     this.applyPreferences(preferences);
+    
+    // Trigger language change event to update components
+    const event = new CustomEvent('languageChange', { 
+      detail: { language: preferences.language } 
+    });
+    window.dispatchEvent(event);
   }
   
   static clearPreferences(): void {
