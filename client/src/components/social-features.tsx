@@ -9,11 +9,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { SocialFeedReal } from '@/components/social-feed-real';
+import { CreatePost } from '@/components/create-post';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useTranslation } from '@/hooks/use-translation';
 import { 
   Users, UserPlus, Mail, Share2, Trophy, Crown, 
   MessageSquare, ThumbsUp, Award, Star, Copy,
   Send, Link2, Facebook, Twitter, Instagram,
-  QrCode, MapPin, Calendar, Target, TrendingUp, Activity
+  QrCode, MapPin, Calendar, Target, TrendingUp, Activity, Search, Plus
 } from 'lucide-react';
 
 interface Friend {

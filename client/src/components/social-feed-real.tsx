@@ -55,8 +55,9 @@ export function SocialFeedReal({ className }: SocialFeedProps) {
 
   const likeMutation = useMutation({
     mutationFn: async ({ postId, action }: { postId: number; action: 'like' | 'unlike' }) => {
-      await apiRequest(`/api/social/posts/${postId}/${action}`, {
+      await fetch(`/api/social/posts/${postId}/${action}`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
       });
     },
     onSuccess: () => {
@@ -66,9 +67,10 @@ export function SocialFeedReal({ className }: SocialFeedProps) {
 
   const commentMutation = useMutation({
     mutationFn: async ({ postId, content }: { postId: number; content: string }) => {
-      await apiRequest(`/api/social/posts/${postId}/comments`, {
+      await fetch(`/api/social/posts/${postId}/comments`, {
         method: 'POST',
-        body: { content },
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
       });
     },
     onSuccess: () => {
