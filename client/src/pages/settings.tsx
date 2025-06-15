@@ -635,31 +635,31 @@ export default function SettingsPage() {
                 <div>
                   <Label className="text-white flex items-center gap-2">
                     <Palette className="h-4 w-4" />
-                    Interfaz
+                    {t('interface')}
                   </Label>
                   <div className="grid grid-cols-2 gap-4 mt-2">
                     <div>
-                      <Label className="text-gray-300">Tema</Label>
+                      <Label className="text-gray-300">{t('theme')}</Label>
                       <Select value={preferencesForm.theme} onValueChange={(value: 'dark' | 'light' | 'system') => setPreferencesForm({...preferencesForm, theme: value})}>
                         <SelectTrigger className="bg-dark-card border-gray-600 text-white">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="dark">Oscuro</SelectItem>
-                          <SelectItem value="light">Claro</SelectItem>
-                          <SelectItem value="system">Sistema</SelectItem>
+                          <SelectItem value="dark">{t('dark')}</SelectItem>
+                          <SelectItem value="light">{t('light')}</SelectItem>
+                          <SelectItem value="system">{t('system')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label className="text-gray-300">Idioma</Label>
+                      <Label className="text-gray-300">{t('language')}</Label>
                       <Select value={preferencesForm.language} onValueChange={(value: 'es' | 'en') => setPreferencesForm({...preferencesForm, language: value})}>
                         <SelectTrigger className="bg-dark-card border-gray-600 text-white">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="es">Español</SelectItem>
-                          <SelectItem value="en">English</SelectItem>
+                          <SelectItem value="es">{t('spanish')}</SelectItem>
+                          <SelectItem value="en">{t('english')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -673,7 +673,7 @@ export default function SettingsPage() {
                     className="bg-green-600 hover:bg-green-700"
                   >
                     <Save className="h-4 w-4 mr-2" />
-                    {updatePreferencesMutation.isPending ? 'Guardando...' : 'Guardar Preferencias'}
+                    {updatePreferencesMutation.isPending ? 'Guardando...' : t('savePreferences')}
                   </Button>
                 </div>
               </CardContent>

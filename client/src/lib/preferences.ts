@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 // Preferences management system
 export interface UserPreferences {
   distanceUnit: 'meters' | 'yards';
@@ -76,6 +78,14 @@ export class PreferencesManager {
       
       // Apply immediate UI changes
       this.applyPreferences(updated);
+      
+      // Trigger language change event for same-tab updates
+      if (preferences.language && preferences.language !== current.language) {
+        const event = new CustomEvent('languageChange', { 
+          detail: { language: preferences.language } 
+        });
+        window.dispatchEvent(event);
+      }
     } catch (error) {
       console.error('Error saving preferences:', error);
     }
@@ -238,9 +248,37 @@ export function getTranslation(key: string, language: 'es' | 'en' = 'es'): strin
   return translations[language][key as keyof typeof translations.es] || key;
 }
 
-// Hook for using translations in components
+// Hook for using translations in components with reactive updates
 export function useTranslation() {
-  const currentLang = (typeof window !== 'undefined' ? localStorage.getItem('language') : 'es') as 'es' | 'en' || 'es';
+  const [currentLang, setCurrentLang] = useState<'es' | 'en'>('es');
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedLang = localStorage.getItem('language') as 'es' | 'en' || 'es';
+      setCurrentLang(savedLang);
+      
+      // Listen for language changes
+      const handleStorageChange = (e: StorageEvent) => {
+        if (e.key === 'language' && e.newValue) {
+          setCurrentLang(e.newValue as 'es' | 'en');
+        }
+      };
+      
+      window.addEventListener('storage', handleStorageChange);
+      
+      // Custom event for same-tab language changes
+      const handleLanguageChange = (e: CustomEvent) => {
+        setCurrentLang(e.detail.language);
+      };
+      
+      window.addEventListener('languageChange', handleLanguageChange as EventListener);
+      
+      return () => {
+        window.removeEventListener('storage', handleStorageChange);
+        window.removeEventListener('languageChange', handleLanguageChange as EventListener);
+      };
+    }
+  }, []);
   
   return {
     t: (key: string) => getTranslation(key, currentLang),

@@ -1,26 +1,28 @@
 import React from 'react';
 import { useLocation } from 'wouter';
 import { Home, BarChart3, History, Plus, Settings } from 'lucide-react';
+import { useTranslation } from '@/lib/preferences';
 
 export function BottomNavigation() {
   const [location, setLocation] = useLocation();
+  const { t } = useTranslation();
 
   const navigationItems = [
     {
       icon: Home,
-      label: 'Inicio',
+      label: t('dashboard'),
       path: '/dashboard',
       active: location === '/dashboard'
     },
     {
       icon: BarChart3,
-      label: 'Analytics',
+      label: t('analytics'),
       path: '/analytics',
       active: location === '/analytics'
     },
     {
       icon: Plus,
-      label: 'Nueva',
+      label: t('createRound'),
       path: '/create-round',
       active: location === '/create-round',
       primary: true
