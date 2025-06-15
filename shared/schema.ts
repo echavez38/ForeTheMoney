@@ -77,6 +77,43 @@ export const scoresRelations = relations(scores, ({ one }) => ({
   }),
 }));
 
+// User preferences table for settings
+export const userPreferences = pgTable("user_preferences", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull().unique(),
+  distanceUnit: varchar("distance_unit", { length: 10 }).default('meters').notNull(),
+  defaultTees: varchar("default_tees", { length: 20 }).default('Azules').notNull(),
+  defaultBettingAmount: integer("default_betting_amount").default(10).notNull(),
+  defaultGameFormat: varchar("default_game_format", { length: 10 }).default('both').notNull(),
+  emailNotifications: boolean("email_notifications").default(true).notNull(),
+  theme: varchar("theme", { length: 10 }).default('dark').notNull(),
+  language: varchar("language", { length: 5 }).default('es').notNull(),
+  fontSize: varchar("font_size", { length: 10 }).default('medium').notNull(),
+  roundReminders: boolean("round_reminders").default(true).notNull(),
+  handicapUpdates: boolean("handicap_updates").default(true).notNull(),
+  friendInvites: boolean("friend_invites").default(true).notNull(),
+  achievements: boolean("achievements").default(true).notNull(),
+  weeklyReports: boolean("weekly_reports").default(false).notNull(),
+  socialActivity: boolean("social_activity").default(true).notNull(),
+  betResults: boolean("bet_results").default(true).notNull(),
+  courseConditions: boolean("course_conditions").default(false).notNull(),
+  sound: boolean("sound").default(true).notNull(),
+  vibration: boolean("vibration").default(true).notNull(),
+  quietHoursEnabled: boolean("quiet_hours_enabled").default(false).notNull(),
+  quietHoursStart: varchar("quiet_hours_start", { length: 5 }).default('22:00').notNull(),
+  quietHoursEnd: varchar("quiet_hours_end", { length: 5 }).default('08:00').notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// User preferences relations
+export const userPreferencesRelations = relations(userPreferences, ({ one }) => ({
+  user: one(users, {
+    fields: [userPreferences.userId],
+    references: [users.id],
+  }),
+}));
+
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   username: true,
@@ -188,3 +225,18 @@ export type InsertPlayer = z.infer<typeof insertPlayerSchema>;
 export type Player = typeof players.$inferSelect;
 export type InsertScore = z.infer<typeof insertScoreSchema>;
 export type Score = typeof scores.$inferSelect;
+
+// User preferences schemas and types
+export const insertUserPreferencesSchema = createInsertSchema(userPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateUserPreferencesSchema = insertUserPreferencesSchema.partial().omit({
+  userId: true,
+});
+
+export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
+export type UpdateUserPreferences = z.infer<typeof updateUserPreferencesSchema>;
+export type UserPreferences = typeof userPreferences.$inferSelect;

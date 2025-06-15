@@ -24,6 +24,12 @@ export interface IStorage {
   updateUser(userId: number, updates: Partial<User>): Promise<User>;
   deleteUser(userId: number): Promise<void>;
   
+  // User preferences operations
+  getUserPreferences(userId: number): Promise<UserPreferences | undefined>;
+  createUserPreferences(preferences: InsertUserPreferences): Promise<UserPreferences>;
+  updateUserPreferences(userId: number, updates: UpdateUserPreferences): Promise<UserPreferences>;
+  deleteUserPreferences(userId: number): Promise<void>;
+  
   // Round operations
   createRound(round: InsertRound): Promise<Round>;
   getRound(id: number): Promise<Round | undefined>;
